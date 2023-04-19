@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+
+User-agent: GoogleBot
+Disallow: /resources
+Disallow: /Admin
+Allow: /

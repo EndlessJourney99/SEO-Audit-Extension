@@ -1,0 +1,50 @@
+{
+    "name": "SEO METAs",
+    "description": "Check all METAs",
+    "version": "0.1",
+    "manifest_version": 3,
+    "permissions": [
+        "tabs",
+        "scripting",
+        "declarativeNetRequest",
+        "desktopCapture",
+        "browsingData"
+    ],
+    "content_scripts": [
+        {
+            "js": [
+                "src/content.ts"
+            ],
+            "matches": [
+                "https://*/*"
+            ]
+        }
+    ],
+    "background": {
+        "service_worker": "src/background.ts",
+        "type": "module"
+    },
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "public/devtool.html"
+            ],
+            "matches": [
+                "<all_urls>"
+            ]
+        }
+    ],
+    "devtools_page": "public/devtools.html",
+    "icons": {
+        "16": "icon16.png",
+        "48": "icon48.png",
+        "128": "icon128.png"
+    },
+    "host_permissions": [
+        "<all_urls>"
+    ],
+    "action": {
+        "default_popup": "index.html",
+        "default_title": "Open the popup"
+    }
+}

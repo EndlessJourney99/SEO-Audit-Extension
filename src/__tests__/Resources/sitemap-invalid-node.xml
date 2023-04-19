@@ -1,0 +1,14 @@
+ <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <sitemapW>
+        <loca>https://dammexe.vn/category-sitemap.xml</loca>
+        <lastmod>2022-10-26T17:08+00:00</lastmod>
+    </sitemapW>
+    <sitemap>
+        <loc>https://dammexe.vn/product-sitemap.xml</loc>
+        <lastmod>2022-10-26T17:08+00:00</lastmod>
+    </sitemap>
+    <sitemap>
+        <loc>https://dammexe.vn/article-sitemap-10-2022.xml</loc>
+        <lastmod>2022-10-26T17:08+00:00</lastmod>
+    </sitemap>
+</sitemapindex>
