@@ -1,3 +1,4 @@
+const resource = /* html */`
 <html lang="en" data-user-theme="dark" class="js-focus-visible" data-js-focus-visible="">
 
 <head>
@@ -337,4 +338,6 @@
     </footer>
 </body>
 
-</html>
+</html>`;
+
+export default resource;

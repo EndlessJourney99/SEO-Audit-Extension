@@ -16,6 +16,8 @@ import {
     FlashAndFrame_Used,
 } from '../Resources/Warning/Flash_Frame_Content';
 import WordCount from '../Resources/Warning/WordCount';
+import LinkLeadToHttp from '../Resources/Warning/LinkLeadToHttp';
+import UncompressedResource from '../Resources/Warning/UncompressResourced';
 
 afterAll(() => {
     jest.resetAllMocks();
@@ -238,7 +240,9 @@ describe('EncodingNotDeclare', () => {
             .fn()
             .mockImplementation(
                 (input: RequestInfo | URL, init?: RequestInit | undefined) => {
-                    if (input.toString().match(/^.*\/header-valid\/*$/m)) {
+                    if (
+                        input.toString().match(/^.*\/header-valid($|\/.*$)/gm)
+                    ) {
                         const responseObj: Response = {
                             ...({} as Response),
                             status: 200,
@@ -376,3 +380,192 @@ describe('WordAndHtmlRatio', () => {
     });
 });
 
+describe('LinkLeadToHttpPageOnHttpsSite', () => {
+    it('Must have 2 http link', () => {
+        const {
+            window: { document },
+        } = new JSDOM(LinkLeadToHttp);
+        const currentUrl = new URL('https://example.com');
+
+        const result = Warning.LinkLeadToHttpPageOnHttpsSite(
+            document,
+            currentUrl
+        );
+        expect(result.length).toBe(2);
+    });
+});
+
+describe('TooManyParameterOnUrl', () => {
+    test('case-1', () => {
+        const url = new URL('https://example.com/abc/ddd?a=1&b=2&c=3');
+        const result = Warning.TooManyParametersOnUrl(url);
+
+        expect(result).toBe(false);
+    });
+    test('case-2', () => {
+        const url = new URL('https://example.com/abc/ddd?a=1&b=2&c=3&d=4');
+        const result = Warning.TooManyParametersOnUrl(url);
+
+        expect(result).toBe(false);
+    });
+    test('case-3', () => {
+        const url = new URL('https://example.com/abc?a=1&b=2&c=3&d=4&e=5');
+        const result = Warning.TooManyParametersOnUrl(url);
+
+        expect(result).toBe(true);
+    });
+    test('case-4', () => {
+        const url = new URL('https://example.com/abc/cate/ddd/tytyt');
+        const result = Warning.TooManyParametersOnUrl(url);
+
+        expect(result).toBe(false);
+    });
+});
+
+describe('UncompressedPage', () => {
+    beforeAll(() => {
+        jest.resetAllMocks();
+        global.fetch = jest
+            .fn()
+            .mockImplementationOnce(() => {
+                return Promise.resolve<Response>({
+                    ...({} as Response),
+                    status: 200,
+                    ok: true,
+                    headers: {
+                        ...({} as Headers),
+                        get: jest.fn((name: string): string | null => {
+                            if (name.toLowerCase() === 'content-encoding')
+                                return 'gzip';
+                            return null;
+                        }),
+                    },
+                });
+            })
+            .mockImplementationOnce(() => {
+                return Promise.resolve<Response>({
+                    ...({} as Response),
+                    status: 200,
+                    ok: true,
+                    headers: {
+                        ...({} as Headers),
+                        get: jest.fn((name: string): string | null => {
+                            if (name.toLowerCase() === 'content-encoding')
+                                return 'br';
+                            return null;
+                        }),
+                    },
+                });
+            })
+            .mockImplementationOnce(() => {
+                return Promise.resolve<Response>({
+                    ...({} as Response),
+                    status: 200,
+                    ok: true,
+                    headers: {
+                        ...({} as Headers),
+                        get: jest.fn((name: string): string | null => {
+                            if (name.toLowerCase() === 'content-encoding')
+                                return '';
+                            return null;
+                        }),
+                    },
+                });
+            })
+            .mockImplementationOnce(() => {
+                return Promise.resolve<Response>({
+                    ...({} as Response),
+                    status: 200,
+                    ok: true,
+                    headers: {
+                        ...({} as Headers),
+                        get: jest.fn((name: string): string | null => {
+                            return null;
+                        }),
+                    },
+                });
+            });
+    });
+    test('case-1', async () => {
+        const currentUrl = new URL('https://example.com');
+        const result = await Warning.UncompressedPage(currentUrl);
+
+        expect(result).toBe(false);
+    });
+    test('case-2', async () => {
+        const currentUrl = new URL('https://example.com');
+        const result = await Warning.UncompressedPage(currentUrl);
+
+        expect(result).toBe(false);
+    });
+    test('case-3', async () => {
+        const currentUrl = new URL('https://example.com');
+        const result = await Warning.UncompressedPage(currentUrl);
+
+        expect(result).toBe(true);
+    });
+    test('case-4', async () => {
+        const currentUrl = new URL('https://example.com');
+        const result = await Warning.UncompressedPage(currentUrl);
+
+        expect(result).toBe(true);
+    });
+});
+
+describe('UncompressedResource', () => {
+    beforeAll(() => {
+        jest.resetAllMocks();
+        global.fetch = jest
+            .fn()
+            .mockImplementation(
+                (input: RequestInfo | URL, init?: RequestInit | undefined) => {
+                    if (input.toString().match(/^.*\/compressed\/.*$/gm)) {
+                        const responseObj: Response = {
+                            ...({} as Response),
+                            status: 200,
+                            ok: true,
+                            headers: {
+                                ...({} as Headers),
+                                get: jest.fn((name: string): string | null => {
+                                    if (
+                                        name.toLowerCase() ===
+                                        'content-encoding'
+                                    )
+                                        return 'gzip';
+                                    return null;
+                                }),
+                            },
+                        };
+                        return Promise.resolve<Response>(responseObj);
+                    } else {
+                        const responseObj: Response = {
+                            ...({} as Response),
+                            status: 200,
+                            ok: true,
+                            headers: {
+                                ...({} as Headers),
+                                get: jest.fn((name: string): string | null => {
+                                    return null;
+                                }),
+                            },
+                        };
+
+                        return Promise.resolve<Response>(responseObj);
+                    }
+                }
+            );
+    });
+
+    it('Must have 4 un-compressed file', async () => {
+        const {
+            window: { document },
+        } = new JSDOM(UncompressedResource);
+        const currentUrl = new URL('https://example.com');
+
+        const result = await Warning.UncompressedJsAndCssFile(
+            document,
+            currentUrl
+        );
+        expect(result).toBe(4);
+    });
+});

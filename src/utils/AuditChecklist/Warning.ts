@@ -1,6 +1,7 @@
 import { convert } from 'html-to-text';
 
-const robotsParser = require('robots-txt-parser');
+import * as robotsParser from 'robots-txt-parser';
+import { GetRedirectionChain } from './ChecklistUtils';
 
 // Unit test integrated
 export const PageWithoutDoctype = (document: Document): boolean => {
@@ -292,6 +293,7 @@ export const LowTextToHtmlRatio = (
     return [ratio < 10.0, ratio];
 };
 
+// Unit test integrated
 export const LinkLeadToHttpPageOnHttpsSite = (
     document: Document,
     currentUrl: URL
@@ -358,4 +360,123 @@ export const NoFollowAttributeInInternalLink = (
     });
 
     return allInternalLinks.filter((i) => i.rel === 'nofollow').length;
+};
+
+// Chỉ có thể chạy trên chrome => không thể viết unit test
+export const TemporaryRedirect = async (currentUrl: URL) => {
+    let redirectionChain: Array<{ redirectUrl: string; status: number }> =
+        await GetRedirectionChain(currentUrl);
+    for (let i = 0; i < redirectionChain.length; i++) {
+        if (
+            redirectionChain[i].status === 307 ||
+            redirectionChain[i].status === 302
+        )
+            return true;
+    }
+    return false;
+};
+
+// export const TooLargeJsAndCssTotalSize = async (document: Document) => {
+//     const allScriptFiles = Array.from(
+//         document.querySelectorAll('script')
+//     ).filter((s) => s.src.length || s.getAttribute('data-src')?.length);
+//     const allStylesheets = Array.from(
+//         document.querySelectorAll("link[rel='stylesheet'][href]")
+//     );
+
+//     for (let i = 0; i < allScriptFiles.length; i++) {
+//         const response  = await fetch(allScriptFiles[i].src);
+//         response.
+//     }
+// };
+
+export const TooManyJavascriptAndCssFiles = (document: Document) => {
+    const allScriptFiles = Array.from(
+        document.querySelectorAll('script')
+    ).filter((s) => s.src.length || s.getAttribute('data-src')?.length);
+    const allStylesheets = Array.from(
+        document.querySelectorAll("link[rel='stylesheet'][href]")
+    );
+
+    return allScriptFiles?.length ?? 0 + allStylesheets?.length ?? 0 >= 100;
+};
+
+export const OnPageLink = (document: Document) => {
+    const allLinks = Array.from(document.querySelectorAll('a[href]'));
+    return allLinks.length;
+};
+
+// Unit test integrated
+export const UncompressedPage = async (currentUrl: URL) => {
+    const response = await fetch(currentUrl);
+    const encoding = response.headers.get('Content-Encoding');
+    if (
+        encoding &&
+        (encoding.toLowerCase() == 'br' ||
+            encoding.toLowerCase() == 'gzip' ||
+            encoding.toLowerCase() == 'deflate')
+    )
+        return false;
+    return true;
+};
+
+export const UnderscoreUrl = (currentUrl: URL) => {
+    return currentUrl.href.includes('_');
+};
+
+// Unit test integrated
+export const TooManyParametersOnUrl = (currentUrl: URL) => {
+    const searchParams = Array.from(currentUrl.searchParams);
+    return searchParams.length > 4;
+};
+
+// Unit test integrated
+export const UncompressedJsAndCssFile = async (
+    document: Document,
+    currentUrl: URL
+) => {
+    const allScriptFiles = Array.from(
+        document.querySelectorAll('script')
+    ).filter((s) => s.src.length || s.getAttribute('data-src')?.length);
+    const allStylesheets = Array.from(
+        document.querySelectorAll<HTMLLinkElement>(
+            "link[rel='stylesheet'][href]"
+        )
+    );
+
+    let parallelTasks = new Array<Promise<Response>>();
+
+    for (let i = 0; i < allScriptFiles.length; i++) {
+        let link =
+            allScriptFiles[i].src ?? allScriptFiles[i].getAttribute('data-src');
+        if (!link.includes('http') && !link.includes('www'))
+            link = `${currentUrl.protocol}//${currentUrl.hostname}/${
+                link.startsWith('/') ? link.substring(1) : link
+            }`;
+        parallelTasks.push(fetch(link));
+    }
+    for (let i = 0; i < allStylesheets.length; i++) {
+        let link = allStylesheets[i].href ?? '';
+        if (!link.includes('http') && !link.includes('www'))
+            link = `${currentUrl.protocol}//${currentUrl.hostname}/${
+                link.startsWith('/') ? link.substring(1) : link
+            }`;
+        parallelTasks.push(fetch(link));
+    }
+
+    const responses = await Promise.all(parallelTasks);
+    const uncompressedFiles = responses.filter((r) => {
+        if (!r.ok) return false;
+        const encoding = r.headers.get('Content-Encoding');
+        if (
+            encoding &&
+            (encoding.toLowerCase() == 'br' ||
+                encoding.toLowerCase() == 'gzip' ||
+                encoding.toLowerCase() == 'deflate')
+        )
+            return false;
+        return true;
+    });
+
+    return uncompressedFiles.length;
 };

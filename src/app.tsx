@@ -4,19 +4,19 @@ import Header from './components/Header';
 import Functions from './components/Functions';
 import Footer from './components/Footer';
 import { GlobalSignal } from './signals/globalSignal';
-import requestCertData from './utils/AuditChecklist/ChecklistUtils';
 
 export const App = () => {
     const state: GlobalSignal = useContext(AppState);
     // const tabInfo = useSignal<chrome.tabs.Tab>({} as chrome.tabs.Tab);
 
-    // useEffect(() => {
-    //     requestCertData(new URL('https://elitedental.com.vn/')).then(
-    //         (result) => {
-    //             console.log(result);
-    //         }
-    //     );
-    // }, []);
+    useEffect(() => {
+        // requestCertData(new URL('https://elitedental.com.vn/')).then(
+        //     (result) => {
+        //         console.log(result);
+        //     }
+        // );
+        // testRedirectInfo();
+    }, []);
 
     return (
         <div className="container mx-auto">

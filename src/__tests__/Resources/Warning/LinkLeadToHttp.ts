@@ -1,3 +1,4 @@
+const resource = /* html */ `
 <html lang="en" data-user-theme="dark" class="js-focus-visible" data-js-focus-visible="">
 
 <head>
@@ -19,4 +20,6 @@
     <a href="http://external.com/bbcd" rel="nofollow"></a>
 </body>
 
-</html>
+</html>`;
+
+export default resource;
