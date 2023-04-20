@@ -1,6 +1,5 @@
 import * as Warning from '../../utils/AuditChecklist/Warning';
 import { JSDOM } from 'jsdom';
-const simpleGet = require('simple-get');
 
 import BlockInternalResources from '../Resources/Warning/BlockInternalResources';
 import Doctype_Valid from '../Resources/Warning/Doctype_Valid';
@@ -24,15 +23,62 @@ afterAll(() => {
 });
 
 describe('BlockedInternalResourceInRobotsTxt', () => {
+    beforeAll(() => {
+        jest.resetAllMocks();
+        global.fetch = jest
+            .fn()
+            .mockImplementationOnce(() =>
+                Promise.resolve<Response>({
+                    ...({} as Response),
+                    status: 200,
+                    ok: true,
+                    text: jest.fn(() => {
+                        return Promise.resolve<string>(`
+                        User-agent: *
+                        Allow: /
+                        Disallow: /resources/
+                        Sitemap: https://example.com/sitemap.xml
+                    `);
+                    }),
+                })
+            )
+            .mockImplementationOnce(() =>
+                Promise.resolve<Response>({
+                    ...({} as Response),
+                    status: 200,
+                    ok: true,
+                    text: jest.fn(() => {
+                        return Promise.resolve<string>(`
+                            User-agent: *
+                            Allow: /
+                            Disallow: /admin
+            
+                            User-agent: googlebot
+                            Disallow: /resources
+                            Disallow: /Admin
+                            Allow: /
+                    `);
+                    }),
+                })
+            )
+            .mockImplementationOnce(() =>
+                Promise.resolve<Response>({
+                    ...({} as Response),
+                    status: 200,
+                    ok: true,
+                    text: jest.fn(() => {
+                        return Promise.resolve<string>(`
+                            User-agent: *
+                            Allow: /
+                            Disallow: /admin
+                            Sitemap: https://example.com/abc/what_is_this.xml
+                        `);
+                    }),
+                })
+            );
+    });
+
     it('Robot_case1', async () => {
-        simpleGet.concat = jest.fn((opts, cb) => {
-            let result = `User-agent: *
-                Allow: /
-                Disallow: /resources/
-                Sitemap: https://example.com/sitemap.xml`;
-            cb(null, result, result);
-            return result;
-        });
         // expect(jest.isMockFunction(simpleGet.concat)).toBe(true);
         const {
             window: { document },
@@ -49,20 +95,6 @@ describe('BlockedInternalResourceInRobotsTxt', () => {
     });
 
     it('Robot_case2', async () => {
-        simpleGet.concat = jest.fn((opts, cb) => {
-            let result = `
-                User-agent: *
-                Allow: /
-                Disallow: /admin
-
-                User-agent: GoogleBot
-                Disallow: /resources
-                Disallow: /Admin
-                Allow: /
-            `;
-            cb(null, result, result);
-            return result;
-        });
         const {
             window: { document },
         } = new JSDOM(BlockInternalResources);
@@ -78,16 +110,6 @@ describe('BlockedInternalResourceInRobotsTxt', () => {
     });
 
     it('Robot_case3', async () => {
-        simpleGet.concat = jest.fn((opts, cb) => {
-            let result = `
-                User-agent: *
-                Allow: /
-                Disallow: /admin
-                Sitemap: https://example.com/abc/what_is_this.xml
-            `;
-            cb(null, result, result);
-            return result;
-        });
         const {
             window: { document },
         } = new JSDOM(BlockInternalResources);

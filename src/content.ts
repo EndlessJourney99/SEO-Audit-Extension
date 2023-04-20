@@ -50,6 +50,9 @@ chrome.runtime.onMessage.addListener(async function (
                     scrollToElem(element.elementObj);
             }
             break;
+        case 'CrawlHTML':
+            sendResponse(CrawlCurrentHTML());
+            break;
         default:
             break;
     }
@@ -163,6 +166,11 @@ function scrollToElem(element: HTMLElement) {
         block: 'center',
         inline: 'center',
     });
+}
+
+function CrawlCurrentHTML() {
+    const constructHTMLString = new XMLSerializer().serializeToString(document);
+    return constructHTMLString;
 }
 // function resetPage(originalParams) {
 //     window.scrollTo(0, originalParams.scrollTop);

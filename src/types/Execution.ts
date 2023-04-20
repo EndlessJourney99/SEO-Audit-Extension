@@ -3,7 +3,8 @@ export type Commands =
     | 'BotRender'
     | 'HighlightElement'
     | 'removeElementHighlight'
-    | 'ScrollToElem';
+    | 'ScrollToElem'
+    | 'CrawlHTML';
 export type BackgroundCommands = 'ListenOnClose';
 
 interface RequestMessage {

@@ -4,7 +4,7 @@ const config: Config.InitialOptions = {
     verbose: true,
     testPathIgnorePatterns: ['/Resources'],
     transform: {
-        '^.+\\.tsx?$': 'ts-jest',
+        '^.+\\.ts?$': 'ts-jest',
     },
 };
 

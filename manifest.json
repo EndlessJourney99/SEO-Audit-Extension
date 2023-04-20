@@ -25,7 +25,6 @@
         "service_worker": "src/background.ts",
         "type": "module"
     },
-    "devtools_page": "public/devtools.html",
     "icons": {
         "16": "icon16.png",
         "48": "icon48.png",

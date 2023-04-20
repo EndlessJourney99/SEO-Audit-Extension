@@ -53,4 +53,23 @@ function randomRange(min: number, max: number): number {
     return Math.ceil(min + Math.random() * (max - min));
 }
 
-export { readCsvFile, storageName, Since, CreateGuid, dbName, randomRange };
+function isValidUrl(urlStr: string): boolean {
+    try {
+        if (urlStr === 'javascript:(0)' || urlStr === 'javascript:;')
+            return false;
+        new URL(urlStr);
+        return true;
+    } catch {
+        return false;
+    }
+}
+
+export {
+    readCsvFile,
+    storageName,
+    Since,
+    CreateGuid,
+    dbName,
+    randomRange,
+    isValidUrl,
+};

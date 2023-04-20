@@ -10,6 +10,7 @@ import BotRender from './BotRender';
 import { GlobalSignal } from '../../signals/globalSignal';
 import { useContext } from 'preact/hooks';
 import { AppState } from '../../signals/globalContext';
+import WarningChecklist from './WarningChecklist';
 
 const Functions = () => {
     const state: GlobalSignal = useContext(AppState);
@@ -50,8 +51,8 @@ const Functions = () => {
                         <Tab icon={<Summarize />} tabKey="Summary">
                             Summary
                         </Tab>
-                        <Tab icon={<Link />} tabKey="HeaderTree">
-                            Header Tree
+                        <Tab icon={<Link />} tabKey="WarningChecklist">
+                            Warning Checklist
                         </Tab>
                         <Tab icon={<Robot />} tabKey="BotRender">
                             Bot Render
@@ -65,10 +66,10 @@ const Functions = () => {
                             <Summary docsInfo={docsInfo} />
                         </TabPanel>
                         <TabPanel
-                            tabKey="HeaderTree"
+                            tabKey="WarningChecklist"
                             className="p-4 rounded-lg bg-gray-50"
                         >
-                            <HeaderTree docsInfo={docsInfo.value} />
+                            <WarningChecklist />
                         </TabPanel>
                         <TabPanel
                             tabKey="BotRender"

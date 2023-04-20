@@ -1,19 +1,20 @@
 import { convert } from 'html-to-text';
 
-import * as robotsParser from 'robots-txt-parser';
+import robotsParser from '../CustomRobotParser';
 import { GetRedirectionChain } from './ChecklistUtils';
+import { isValidUrl } from '../GlobalUtils';
 
 // Unit test integrated
-export const PageWithoutDoctype = (document: Document): boolean => {
-    return document.doctype === null;
+export const PageWithoutDoctype = (DOM: Document): boolean => {
+    return DOM.doctype === null;
 };
 
 // Unit test integrated
 export const BrokenExternalImages = async (
-    document: Document,
+    DOM: Document,
     currentUrl: URL
 ): Promise<Array<string>> => {
-    const allImgs = Array.from(document.querySelectorAll('img')).filter(
+    const allImgs = Array.from(DOM.querySelectorAll('img')).filter(
         (i) => i.src.length || i.getAttribute('data-src')?.length
     );
 
@@ -30,22 +31,31 @@ export const BrokenExternalImages = async (
         const url = externalImg[i].getAttribute('src')?.length
             ? externalImg[i].getAttribute('src')
             : externalImg[i].getAttribute('data-src');
-        if (url?.length)
+        if (url?.length && isValidUrl(url))
             parallelTasks.push(
                 fetch(url, { redirect: 'follow', method: 'HEAD' })
             );
     }
 
-    const responses = await Promise.all(parallelTasks);
-    return responses.filter((r) => !r.ok).map((r) => r.url);
+    const responses = await Promise.all(
+        parallelTasks.map((t) =>
+            t.catch((e) => {
+                console.log(e);
+                return e;
+            })
+        )
+    );
+    return responses
+        .filter((r) => !(r instanceof Error) && !r.ok)
+        .map((r) => r.url);
 };
 
 // Unit test integrated
 export const BrokenExternalLinks = async (
-    document: Document,
+    DOM: Document,
     currentUrl: URL
 ): Promise<Array<string>> => {
-    const allLinks = Array.from(document.querySelectorAll('a')).filter(
+    const allLinks = Array.from(DOM.querySelectorAll('a')).filter(
         (i) =>
             i.getAttribute('href') &&
             i.getAttribute('href')?.length &&
@@ -65,20 +75,28 @@ export const BrokenExternalLinks = async (
     let parallelTasks = new Array<Promise<Response>>();
     for (let i = 0; i < externalLinks.length; i++) {
         const url = externalLinks[i].getAttribute('href');
-        if (url?.length)
+        if (url?.length && isValidUrl(url))
             parallelTasks.push(
                 fetch(url, { redirect: 'follow', method: 'HEAD' })
             );
     }
-
-    const responses = await Promise.all(parallelTasks);
-    return responses.filter((r) => !r.ok).map((r) => r.url);
+    const responses = await Promise.all(
+        parallelTasks.map((t) =>
+            t.catch((e) => {
+                console.log(e);
+                return e;
+            })
+        )
+    );
+    return responses
+        .filter((r) => !(r instanceof Error) && !r.ok)
+        .map((r) => r.url);
 };
 
 // Unit test integrated
-export const DuplicateH1AndTitleContent = (document: Document): boolean => {
-    const titleTag = document.querySelector('title')?.textContent;
-    const H1Tags = Array.from(document.querySelectorAll('h1')).map(
+export const DuplicateH1AndTitleContent = (DOM: Document): boolean => {
+    const titleTag = DOM.querySelector('title')?.textContent;
+    const H1Tags = Array.from(DOM.querySelectorAll('h1')).map(
         (i) => i.textContent
     );
     return H1Tags.filter((h) => h === titleTag).length > 0;
@@ -86,14 +104,14 @@ export const DuplicateH1AndTitleContent = (document: Document): boolean => {
 
 // Unit test integrated
 export const EncodingNotDeclare = async (
-    document: Document,
+    DOM: Document,
     currentUrl: URL
 ): Promise<boolean> => {
     const requestHeader = fetch(currentUrl, {
         redirect: 'follow',
         method: 'GET',
     });
-    const metaEncoding = document.querySelector('meta[charset]');
+    const metaEncoding = DOM.querySelector('meta[charset]');
     if (metaEncoding !== null && metaEncoding.getAttribute('charset')?.length)
         return false;
 
@@ -109,9 +127,9 @@ export const EncodingNotDeclare = async (
 };
 
 // Unit test integrated
-export const FlashContentUsed = (document: Document) => {
-    const embeds = Array.from(document.querySelectorAll('embed'));
-    const objects = Array.from(document.querySelectorAll('object'));
+export const FlashContentUsed = (DOM: Document) => {
+    const embeds = Array.from(DOM.querySelectorAll('embed'));
+    const objects = Array.from(DOM.querySelectorAll('object'));
 
     for (let i = 0; i < embeds.length; i++) {
         if (
@@ -154,16 +172,16 @@ export const FlashContentUsed = (document: Document) => {
 };
 
 // Unit test integrated
-export const FrameUsed = (document: Document): boolean => {
+export const FrameUsed = (DOM: Document): boolean => {
     return (
-        document.querySelector('frame') !== null ||
-        document.querySelector('iframe') !== null
+        DOM.querySelector('frame') !== null ||
+        DOM.querySelector('iframe') !== null
     );
 };
 
 // Unit test integrated
 export const BlockedInternalResourceInRobotsTxt = async (
-    document: Document,
+    DOM: Document,
     baseUrl: URL,
     userAgent: string
 ) => {
@@ -174,7 +192,7 @@ export const BlockedInternalResourceInRobotsTxt = async (
 
     await robots.useRobotsFor(baseUrl.origin);
 
-    const internalImages = Array.from(document.querySelectorAll('img')).filter(
+    const internalImages = Array.from(DOM.querySelectorAll('img')).filter(
         (i) =>
             (i.getAttribute('src')?.length ||
                 i.getAttribute('data-src')?.length) &&
@@ -187,9 +205,7 @@ export const BlockedInternalResourceInRobotsTxt = async (
                     i.getAttribute('data-src')?.indexOf('www') === -1))
     );
 
-    const internalScript = Array.from(
-        document.querySelectorAll('script')
-    ).filter(
+    const internalScript = Array.from(DOM.querySelectorAll('script')).filter(
         (s) =>
             s.getAttribute('src') !== null &&
             (s.getAttribute('src')?.includes(baseUrl.hostname) ||
@@ -197,7 +213,7 @@ export const BlockedInternalResourceInRobotsTxt = async (
                     s.getAttribute('src')?.indexOf('www') === -1))
     );
     const internalStyleSheet = Array.from(
-        document.querySelectorAll('link[rel="stylesheet"]')
+        DOM.querySelectorAll('link[rel="stylesheet"]')
     ).filter(
         (s) =>
             s.getAttribute('href')?.length &&
@@ -214,7 +230,7 @@ export const BlockedInternalResourceInRobotsTxt = async (
         if (!link) continue;
         let pathName: string = '';
         if (link && link.indexOf(baseUrl.hostname) === -1) pathName = link;
-        else pathName = new URL(link).pathname;
+        else if (isValidUrl(link)) pathName = new URL(link).pathname;
 
         const result = robots.canCrawlSync(pathName);
 
@@ -250,44 +266,44 @@ export const BlockedInternalResourceInRobotsTxt = async (
     return false;
 };
 
-export const LongTitleElement = (document: Document): boolean => {
-    let titleText = document.querySelector('title')?.text;
+export const LongTitleElement = (DOM: Document): boolean => {
+    let titleText = DOM.querySelector('title')?.text;
     if (titleText && titleText.length > 70) return true;
     return false;
 };
 
-export const ShortTitleElement = (document: Document): boolean => {
-    let titleText = document.querySelector('title')?.text;
-    if (titleText === undefined || titleText.length <= 70) return true;
+export const ShortTitleElement = (DOM: Document): boolean => {
+    let titleText = DOM.querySelector('title')?.text;
+    if (titleText === undefined || titleText.length <= 10) return true;
     return false;
 };
 
 // Unit test integrated
 export const LowWordCount = (
-    document: Document
+    DOM: Document
 ): [isLow: boolean, wordsCount: number] => {
-    const contentText = convert(document.body.outerHTML);
+    const contentText = convert(DOM.body.outerHTML);
     let words: string[] = contentText?.split(/[\s,\n\r]+/gm) ?? [];
     words = words.filter((w) => w.length && w.match(/\w*$/g));
     return [words.length <= 300, words.length];
 };
 
-export const PageWithoutH1 = (document: Document): boolean => {
-    return document.querySelector('h1') === null;
+export const PageWithoutH1 = (DOM: Document): boolean => {
+    return DOM.querySelector('h1') === null;
 };
 
-export const MissingAltAttribute = (document: Document): number => {
-    const allImgs = Array.from(document.querySelectorAll('img'));
+export const MissingAltAttribute = (DOM: Document): number => {
+    const allImgs = Array.from(DOM.querySelectorAll('img'));
 
     return allImgs.filter((i) => i.alt.length === 0).length;
 };
 
 // Unit test integrated
 export const LowTextToHtmlRatio = (
-    document: Document
+    DOM: Document
 ): [isLow: boolean, ratio: number] => {
-    const htmlString = `<html>${document.documentElement.innerHTML}</html>`;
-    const contentText = convert(document.body.outerHTML);
+    const htmlString = `<html>${DOM.documentElement.innerHTML}</html>`;
+    const contentText = convert(DOM.body.outerHTML);
     const ratio = Math.ceil((contentText.length / htmlString.length) * 100);
 
     return [ratio < 10.0, ratio];
@@ -295,12 +311,12 @@ export const LowTextToHtmlRatio = (
 
 // Unit test integrated
 export const LinkLeadToHttpPageOnHttpsSite = (
-    document: Document,
+    DOM: Document,
     currentUrl: URL
 ): string[] => {
     if (currentUrl.protocol === 'http:') return [];
-    const baseTag = document.querySelector('base');
-    const anchorTags = document.querySelectorAll('a');
+    const baseTag = DOM.querySelector('base');
+    const anchorTags = DOM.querySelectorAll('a');
 
     let baseTagHttp = false;
     const lstHttpLinks: string[] = new Array<string>();
@@ -321,28 +337,28 @@ export const LinkLeadToHttpPageOnHttpsSite = (
     return lstHttpLinks;
 };
 
-export const PageWithoutMetaDescription = (document: Document) => {
-    const metaDesc = document
-        .querySelector("meta[name='description']")
-        ?.getAttribute('content');
+export const PageWithoutMetaDescription = (DOM: Document) => {
+    const metaDesc = DOM.querySelector(
+        "meta[name='description']"
+    )?.getAttribute('content');
     if (metaDesc?.length) return false;
     return true;
 };
 
-export const MissingHreflangAndLangAttribute = (document: Document) => {
+export const MissingHreflangAndLangAttribute = (DOM: Document) => {
     const hreflangTags = Array.from(
-        document.querySelectorAll("link[rel='alternate'][hreflang]")
+        DOM.querySelectorAll("link[rel='alternate'][hreflang]")
     );
-    const htmlLangAttr = document.documentElement.lang ?? '';
+    const htmlLangAttr = DOM.documentElement.lang ?? '';
     return hreflangTags.length === 0 && htmlLangAttr.length === 0;
 };
 
 export const NoFollowAttributeInInternalLink = (
-    document: Document,
+    DOM: Document,
     currentUrl: URL
 ): number => {
     const allInternalLinks = Array.from(
-        document.querySelectorAll<HTMLAnchorElement>('a[href]')
+        DOM.querySelectorAll<HTMLAnchorElement>('a[href]')
     ).filter((i) => {
         try {
             if (
@@ -376,12 +392,12 @@ export const TemporaryRedirect = async (currentUrl: URL) => {
     return false;
 };
 
-// export const TooLargeJsAndCssTotalSize = async (document: Document) => {
+// export const TooLargeJsAndCssTotalSize = async (DOM: Document) => {
 //     const allScriptFiles = Array.from(
-//         document.querySelectorAll('script')
+//         DOM.querySelectorAll('script')
 //     ).filter((s) => s.src.length || s.getAttribute('data-src')?.length);
 //     const allStylesheets = Array.from(
-//         document.querySelectorAll("link[rel='stylesheet'][href]")
+//         DOM.querySelectorAll("link[rel='stylesheet'][href]")
 //     );
 
 //     for (let i = 0; i < allScriptFiles.length; i++) {
@@ -390,19 +406,19 @@ export const TemporaryRedirect = async (currentUrl: URL) => {
 //     }
 // };
 
-export const TooManyJavascriptAndCssFiles = (document: Document) => {
-    const allScriptFiles = Array.from(
-        document.querySelectorAll('script')
-    ).filter((s) => s.src.length || s.getAttribute('data-src')?.length);
+export const TooManyJavascriptAndCssFiles = (DOM: Document) => {
+    const allScriptFiles = Array.from(DOM.querySelectorAll('script')).filter(
+        (s) => s.src.length || s.getAttribute('data-src')?.length
+    );
     const allStylesheets = Array.from(
-        document.querySelectorAll("link[rel='stylesheet'][href]")
+        DOM.querySelectorAll("link[rel='stylesheet'][href]")
     );
 
     return allScriptFiles?.length ?? 0 + allStylesheets?.length ?? 0 >= 100;
 };
 
-export const OnPageLink = (document: Document) => {
-    const allLinks = Array.from(document.querySelectorAll('a[href]'));
+export const OnPageLink = (DOM: Document) => {
+    const allLinks = Array.from(DOM.querySelectorAll('a[href]'));
     return allLinks.length;
 };
 
@@ -432,16 +448,14 @@ export const TooManyParametersOnUrl = (currentUrl: URL) => {
 
 // Unit test integrated
 export const UncompressedJsAndCssFile = async (
-    document: Document,
+    DOM: Document,
     currentUrl: URL
 ) => {
-    const allScriptFiles = Array.from(
-        document.querySelectorAll('script')
-    ).filter((s) => s.src.length || s.getAttribute('data-src')?.length);
+    const allScriptFiles = Array.from(DOM.querySelectorAll('script')).filter(
+        (s) => s.src.length || s.getAttribute('data-src')?.length
+    );
     const allStylesheets = Array.from(
-        document.querySelectorAll<HTMLLinkElement>(
-            "link[rel='stylesheet'][href]"
-        )
+        DOM.querySelectorAll<HTMLLinkElement>("link[rel='stylesheet'][href]")
     );
 
     let parallelTasks = new Array<Promise<Response>>();
@@ -449,11 +463,12 @@ export const UncompressedJsAndCssFile = async (
     for (let i = 0; i < allScriptFiles.length; i++) {
         let link =
             allScriptFiles[i].src ?? allScriptFiles[i].getAttribute('data-src');
+        if (link.includes('chrome-extension://')) continue;
         if (!link.includes('http') && !link.includes('www'))
             link = `${currentUrl.protocol}//${currentUrl.hostname}/${
                 link.startsWith('/') ? link.substring(1) : link
             }`;
-        parallelTasks.push(fetch(link));
+        if (isValidUrl(link)) parallelTasks.push(fetch(link));
     }
     for (let i = 0; i < allStylesheets.length; i++) {
         let link = allStylesheets[i].href ?? '';
@@ -461,12 +476,14 @@ export const UncompressedJsAndCssFile = async (
             link = `${currentUrl.protocol}//${currentUrl.hostname}/${
                 link.startsWith('/') ? link.substring(1) : link
             }`;
-        parallelTasks.push(fetch(link));
+        if (isValidUrl(link)) parallelTasks.push(fetch(link));
     }
 
-    const responses = await Promise.all(parallelTasks);
+    const responses = await Promise.all(
+        parallelTasks.map((t) => t.catch((e) => e))
+    );
     const uncompressedFiles = responses.filter((r) => {
-        if (!r.ok) return false;
+        if (r instanceof Error || !r.ok) return false;
         const encoding = r.headers.get('Content-Encoding');
         if (
             encoding &&
