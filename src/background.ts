@@ -45,7 +45,8 @@ const removeTabData = (tabId: number) => {
 //     sendResponse
 // ) {
 //     switch (message.Command) {
-//         case 'ListenOnClose':
+//         case 'RunFetchInBG':
+//             RunFetch(message.Data);
 //             break;
 
 //         default:
@@ -55,7 +56,4 @@ const removeTabData = (tabId: number) => {
 
 chrome.tabs.onRemoved.addListener((tabId, info) => {
     removeTabData(tabId);
-    
 });
-
-

@@ -6,15 +6,17 @@ type props = {
     tabKey: string | number;
     children: string;
     icon?: JSX.Element;
+    callBack?: (tabKey: string | number) => void;
 };
 
-const Tab = ({ tabKey, children, icon }: props) => {
+const Tab = ({ tabKey, children, icon, callBack }: props) => {
     const state: tabContextProps = useContext(TabContext);
     const isActive = computed(() =>
         state.activeKey.value === tabKey ? true : false
     );
     const tabClick = () => {
         if (state.activeKey.peek() !== tabKey) state.activeKey.value = tabKey;
+        if (callBack) callBack(tabKey);
     };
 
     return (

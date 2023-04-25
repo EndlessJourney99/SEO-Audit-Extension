@@ -414,7 +414,7 @@ export const TooManyJavascriptAndCssFiles = (DOM: Document) => {
         DOM.querySelectorAll("link[rel='stylesheet'][href]")
     );
 
-    return allScriptFiles?.length ?? 0 + allStylesheets?.length ?? 0 >= 100;
+    return (allScriptFiles?.length ?? 0 + allStylesheets?.length ?? 0) >= 100;
 };
 
 export const OnPageLink = (DOM: Document) => {

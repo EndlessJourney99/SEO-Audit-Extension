@@ -25,10 +25,32 @@ const RequestPageDocument = async (tabId: number): Promise<DocumentInfo> => {
     throw new Error('There is no active tab!');
 };
 
-const useInit = (tabInfo: chrome.tabs.Tab) => {
+const useInit = (tabInfo: chrome.tabs.Tab, updateSignal: number) => {
     const { getByID, add, update } = useIndexedDB(storageName);
     const IsProcessing = useSignal<boolean>(false);
     const docsInfo = useSignal<DocumentInfo | null>(null);
+    const savedActiveTab = useSignal<string | null>(null);
+
+    const UpdateActiveTab = async (tabKey: string) => {
+        getByID<DbSchema>(tabInfo.id ?? -1).then(async (data) => {
+            if (data) {
+                update<DbSchema>({
+                    ...data,
+                    ActiveTab: tabKey,
+                }).then(
+                    (id) => {
+                        console.log(`updated : ID ${id}`);
+                    },
+                    (error) => {
+                        console.error(
+                            `Failed to updated ${tabInfo.id} : ${error}`
+                        );
+                    }
+                );
+            }
+        });
+        savedActiveTab.value = tabKey;
+    };
 
     const initData = (isUpdate: boolean) =>
         RequestPageDocument(tabInfo.id ?? -1).then(async (val) => {
@@ -45,7 +67,7 @@ const useInit = (tabInfo: chrome.tabs.Tab) => {
                     },
                     (error) => {
                         console.error(
-                            `Failed to udpated ${tabInfo.id} : ${error}`
+                            `Failed to updated ${tabInfo.id} : ${error}`
                         );
                     }
                 );
@@ -77,6 +99,7 @@ const useInit = (tabInfo: chrome.tabs.Tab) => {
                     await initData(true);
                 } else {
                     docsInfo.value = data.DocumentInfo;
+                    savedActiveTab.value = data.ActiveTab ?? null;
                 }
                 IsProcessing.value = false;
             });
@@ -88,9 +111,9 @@ const useInit = (tabInfo: chrome.tabs.Tab) => {
 
     useEffect(() => {
         initFunc();
-    }, [tabInfo.id, tabInfo.url]);
+    }, [tabInfo.id, tabInfo.url, updateSignal]);
 
-    return { docsInfo, IsProcessing };
+    return { docsInfo, IsProcessing, UpdateActiveTab, savedActiveTab };
 };
 
 export default useInit;

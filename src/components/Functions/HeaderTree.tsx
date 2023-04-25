@@ -2,6 +2,7 @@ import { useContext, useEffect } from 'preact/hooks';
 import { GlobalSignal } from '../../signals/globalSignal';
 import { DocumentInfo, RequestMessage, TagName } from '../../types/Execution';
 import { AppState } from '../../signals/globalContext';
+import { ScrollToElem, TriggerHighlight } from '../../utils/SendCommand';
 
 type props = {
     docsInfo: DocumentInfo | null;
@@ -25,24 +26,6 @@ const branchStyle = (strTagName: string) => {
         default:
             return 'pl-0';
     }
-};
-
-const TriggerHighlight = (
-    uniqueId: string,
-    tabId: number,
-    isHighligh: boolean
-) => {
-    chrome.tabs.sendMessage<RequestMessage>(tabId, {
-        Command: isHighligh ? 'HighlightElement' : 'removeElementHighlight',
-        OptionParameters: { elementId: uniqueId },
-    });
-};
-
-const ScrollToElem = (uniqueId: string, tabId: number) => {
-    chrome.tabs.sendMessage<RequestMessage>(tabId, {
-        Command: 'ScrollToElem',
-        OptionParameters: { elementId: uniqueId },
-    });
 };
 
 const HeaderTree = ({ docsInfo }: props) => {

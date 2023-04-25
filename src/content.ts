@@ -23,7 +23,7 @@ chrome.runtime.onMessage.addListener(async function (
             break;
         case 'HighlightElement':
             {
-                let element = headerTree.find(
+                let element = anchorTags.find(
                     (e) => e.uniqueId === message.OptionParameters.elementId
                 );
                 if (element && element.elementObj) {
@@ -33,7 +33,7 @@ chrome.runtime.onMessage.addListener(async function (
             break;
         case 'removeElementHighlight':
             {
-                let element = headerTree.find(
+                let element = anchorTags.find(
                     (e) => e.uniqueId === message.OptionParameters.elementId
                 );
                 if (element && element.elementObj) {
@@ -43,7 +43,7 @@ chrome.runtime.onMessage.addListener(async function (
             break;
         case 'ScrollToElem':
             {
-                const element = headerTree.find(
+                const element = anchorTags.find(
                     (e) => e.uniqueId === message.OptionParameters.elementId
                 );
                 if (element && element.elementObj)
@@ -128,7 +128,14 @@ const getAllAnchor = (): HTMLAnchor[] => {
     return AnchorElements.filter(
         (a) => a.href.length && a.href !== 'javascript:;'
     ).map<HTMLAnchor>((a) => {
-        return { href: a.href, text: a.textContent };
+        return {
+            uniqueId: CreateGuid(),
+            href: a.href,
+            text: a.textContent,
+            rel: a.rel,
+            representString: a.outerHTML,
+            elementObj: a,
+        };
     });
 };
 

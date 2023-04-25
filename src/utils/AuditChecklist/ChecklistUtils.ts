@@ -80,11 +80,9 @@ export const GetRedirectionChain = async (url: URL) => {
             status: details.statusCode,
         });
     };
-    chrome.webRequest.onBeforeRedirect.addListener(
-        fnc,
-        { urls: ['<all_urls>'] },
-        ['responseHeaders']
-    );
+    chrome.webRequest.onBeforeRedirect.addListener(fnc, { urls: [url.href] }, [
+        'responseHeaders',
+    ]);
 
     await fetch(url);
     chrome.webRequest.onBeforeRedirect.removeListener(fnc);

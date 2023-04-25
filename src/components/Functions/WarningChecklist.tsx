@@ -1,9 +1,3 @@
-import { useSignal } from '@preact/signals';
-import { useContext, useEffect } from 'preact/hooks';
-import { GlobalSignal } from '../../signals/globalSignal';
-import { AppState } from '../../signals/globalContext';
-import { RequestMessage } from '../../types/Execution';
-import { PageWithoutDoctype } from '../../utils/AuditChecklist/Warning';
 import useWarningCheckList from '../../hooks/useWarningChecklist';
 
 const WarningChecklist = () => {
@@ -205,6 +199,145 @@ const WarningChecklist = () => {
                         Google bot cannot crawl resources like script, css or
                         image. Consider open these resource so google bot could
                         resolve and render correct version of your website!
+                    </td>
+                </tr>
+            );
+            index++;
+        }
+        if (checkList.missingHreflangAndLangAttribute) {
+            rows.push(
+                <tr>
+                    <td>{index}</td>
+                    <td>Missing Hreflang and HTML Lang Attribute</td>
+                    <td>
+                        If website have others language version, consider using
+                        hreflang and HTML lang attribute.
+                    </td>
+                </tr>
+            );
+            index++;
+        }
+        if (checkList.noFollowAttributeInInternalLink) {
+            rows.push(
+                <tr>
+                    <td>{index}</td>
+                    <td>No Follow Attribute On Internal Links</td>
+                    <td>
+                        Page contains{' '}
+                        {checkList.noFollowAttributeInInternalLink} internal
+                        links with no-follow attribute.
+                    </td>
+                </tr>
+            );
+            index++;
+        }
+        if (checkList.tooManyJavascriptAndCssFiles) {
+            rows.push(
+                <tr>
+                    <td>{index}</td>
+                    <td>Page contains too many JS and CSS files</td>
+                    <td>
+                        Consider reduce number of required JS and CSS files to
+                        improve page performance.
+                    </td>
+                </tr>
+            );
+            index++;
+        }
+        if (checkList.underscoreUrl) {
+            rows.push(
+                <tr>
+                    <td>{index}</td>
+                    <td>URL contains underscore</td>
+                    <td>Consider remove underscore in URL.</td>
+                </tr>
+            );
+            index++;
+        }
+        if (checkList.tooManyParametersOnUrl) {
+            rows.push(
+                <tr>
+                    <td>{index}</td>
+                    <td>URL contains too many query parameters</td>
+                    <td>Consider reduce number of query parameters on URL.</td>
+                </tr>
+            );
+            index++;
+        }
+        if (
+            checkList.brokenExternalImgs &&
+            checkList.brokenExternalImgs.length
+        ) {
+            rows.push(
+                <tr>
+                    <td>{index}</td>
+                    <td>Page contains broken external images</td>
+                    <td>
+                        There are {checkList.brokenExternalImgs.length} broken
+                        external images on this page.
+                    </td>
+                </tr>
+            );
+            index++;
+        }
+        if (
+            checkList.brokenExternalLinks &&
+            checkList.brokenExternalLinks.length
+        ) {
+            rows.push(
+                <tr>
+                    <td>{index}</td>
+                    <td>Page contains broken external links</td>
+                    <td>
+                        There are {checkList.brokenExternalLinks.length} broken
+                        external links on this page.
+                    </td>
+                </tr>
+            );
+            index++;
+        }
+        if (checkList.encodingNotDeclare) {
+            rows.push(
+                <tr>
+                    <td>{index}</td>
+                    <td>Document encoding not declare</td>
+                    <td></td>
+                </tr>
+            );
+            index++;
+        }
+        if (checkList.TemporaryRedirect) {
+            rows.push(
+                <tr>
+                    <td>{index}</td>
+                    <td>Temporary Redirection Being Used</td>
+                    <td>Consider using permanent redirect.</td>
+                </tr>
+            );
+            index++;
+        }
+        if (checkList.UncompressedPage) {
+            rows.push(
+                <tr>
+                    <td>{index}</td>
+                    <td>Un-Compressed Page</td>
+                    <td>
+                        Website not using any of compression methods (like
+                        gzip). Consider using one for faster loading website.
+                    </td>
+                </tr>
+            );
+            index++;
+        }
+        if (checkList.uncompressedJsAndCssFile) {
+            rows.push(
+                <tr>
+                    <td>{index}</td>
+                    <td>Un-Compressed Js and Css Files</td>
+                    <td>
+                        Website load ({checkList.uncompressedJsAndCssFile})
+                        un-compressed JS and CSS files. This lead to slower
+                        loading time of website.
                     </td>
                 </tr>
             );

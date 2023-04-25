@@ -1,3 +1,4 @@
+import { BackgroundMessage } from '../../types/Execution';
 import {
     ISO_3166_1_Alpha2_Country,
     ISO_639_1_Language,
@@ -9,12 +10,16 @@ export const BrokenCanonical = async (document: Document) => {
     const canonicalUrl = document.querySelector<HTMLLinkElement>(
         "link[rel='canonical']"
     )?.href;
-    if (canonicalUrl) {
-        const response = await fetch(canonicalUrl);
-        if (response.ok) return false;
-        return true;
+    try {
+        if (canonicalUrl) {
+            const response = await fetch(canonicalUrl);
+            if (response.ok) return false;
+            return true;
+        }
+        return false;
+    } catch {
+        return false;
     }
-    return false;
 };
 
 // TESTED
@@ -98,8 +103,10 @@ export const BrokenInternalJsAndCss = async (
         parallelTasks.push(fetch(link));
     }
 
-    const responses = await Promise.all(parallelTasks);
-    return responses.filter((r) => !r.ok).length;
+    const responses = await Promise.all(
+        parallelTasks.map((t) => t.catch((e) => e))
+    );
+    return responses.filter((r) => !(r instanceof Error) && !r.ok).length;
 };
 
 // TESTED
@@ -132,8 +139,12 @@ export const BrokenInternalImage = async (
             );
     }
 
-    const responses = await Promise.all(parallelTasks);
-    return responses.filter((r) => !r.ok).map((r) => r.url);
+    const responses = await Promise.all(
+        parallelTasks.map((t) => t.catch((e) => e))
+    );
+    return responses
+        .filter((r) => !(r instanceof Error) && !r.ok)
+        .map((r) => r.url);
 };
 
 // TESTED
@@ -164,8 +175,12 @@ export const BrokenInternalLinks = async (
             );
     }
 
-    const responses = await Promise.all(parallelTasks);
-    return responses.filter((r) => !r.ok).map((r) => r.url);
+    const responses = await Promise.all(
+        parallelTasks.map((t) => t.catch((e) => e))
+    );
+    return responses
+        .filter((r) => !(r instanceof Error) && !r.ok)
+        .map((r) => r.url);
 };
 
 // TESTED
@@ -204,8 +219,10 @@ export const IncorrectHreflangLink = async (document: Document) => {
         if (link && link.length > 1) parallelTasks.push(fetch(link));
     }
 
-    const responses = await Promise.all(parallelTasks);
-    return responses.filter((r) => !r.ok).length;
+    const responses = await Promise.all(
+        parallelTasks.map((t) => t.catch((e) => e))
+    );
+    return responses.filter((r) => !(r instanceof Error) && !r.ok).length;
 };
 
 // TESTED

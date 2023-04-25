@@ -5,7 +5,7 @@ export type Commands =
     | 'removeElementHighlight'
     | 'ScrollToElem'
     | 'CrawlHTML';
-export type BackgroundCommands = 'ListenOnClose';
+export type BackgroundCommands = 'ListenOnClose' | 'RunFetchInBG';
 
 interface RequestMessage {
     Command: Commands;
@@ -15,6 +15,7 @@ interface RequestMessage {
 
 interface BackgroundMessage {
     Command: BackgroundCommands;
+    Data?: any;
     TabId?: number;
 }
 
@@ -42,8 +43,12 @@ interface HTMLImage {
 }
 
 interface HTMLAnchor {
+    uniqueId: string;
     text: string | null;
+    rel: string;
     href: string;
+    representString: string;
+    elementObj?: HTMLElement;
 }
 
 interface DocumentInfo {
