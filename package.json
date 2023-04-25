@@ -5,8 +5,8 @@
     "type": "module",
     "scripts": {
         "dev": "vite",
-        "build": "jest && tsc && vite build",
-        "build-no-test": "tsc && vite build",
+        "build": "jest && tsc -p tsconfig.prod.json && vite build",
+        "build-no-test": "tsc -p tsconfig.prod.json && vite build",
         "preview": "vite preview",
         "test": "jest --config ./jest.config.ts"
     },
