@@ -119,7 +119,11 @@ const useErrorChecklist = () => {
                 );
             }
         });
-    }, []);
+    }, [
+        state.tabInfo.value.id,
+        state.tabInfo.value.url,
+        state.updateSignal.value,
+    ]);
     return { errorCheckList, isLoading };
 };
 

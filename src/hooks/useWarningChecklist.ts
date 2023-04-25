@@ -171,7 +171,11 @@ const useWarningCheckList = () => {
                 );
             }
         });
-    }, [state.updateSignal.value]);
+    }, [
+        state.tabInfo.value.id,
+        state.tabInfo.value.url,
+        state.updateSignal.value,
+    ]);
     return { warningCheckList, isLoading };
 };
 
