@@ -33,7 +33,7 @@ export const BrokenExternalImages = async (
             : externalImg[i].getAttribute('data-src');
         if (url?.length && isValidUrl(url))
             parallelTasks.push(
-                fetch(url, { redirect: 'follow', method: 'HEAD' })
+                fetch(url, { redirect: 'follow', method: 'GET' })
             );
     }
 
@@ -77,7 +77,7 @@ export const BrokenExternalLinks = async (
         const url = externalLinks[i].getAttribute('href');
         if (url?.length && isValidUrl(url))
             parallelTasks.push(
-                fetch(url, { redirect: 'follow', method: 'HEAD' })
+                fetch(url, { redirect: 'follow', method: 'GET' })
             );
     }
     const responses = await Promise.all(

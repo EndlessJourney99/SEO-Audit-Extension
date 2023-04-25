@@ -46,7 +46,12 @@ const removeTabData = (tabId: number) => {
 // ) {
 //     switch (message.Command) {
 //         case 'RunFetchInBG':
-//             RunFetch(message.Data);
+//             // RunFetch(message.Data);
+//             fetch(
+//                 'https://chrome.google.com/webstore/detail/nofollow/dfogidghaigoomjdeacndafapdijmiid?hl=en'
+//             )
+//                 .then((val) => console.log(val))
+//                 .catch((e) => console.error(e));
 //             break;
 
 //         default:
@@ -57,3 +62,7 @@ const removeTabData = (tabId: number) => {
 chrome.tabs.onRemoved.addListener((tabId, info) => {
     removeTabData(tabId);
 });
+
+// async function RunFetch(urls: Array<string>) {
+//     for (let i = 0; i < urls.length; i++) {}
+// }

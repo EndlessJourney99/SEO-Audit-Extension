@@ -4,6 +4,7 @@ import Header from './components/Header';
 import Functions from './components/Functions';
 import Footer from './components/Footer';
 import { GlobalSignal } from './signals/globalSignal';
+import { BackgroundMessage } from './types/Execution';
 
 export const App = () => {
     const state: GlobalSignal = useContext(AppState);

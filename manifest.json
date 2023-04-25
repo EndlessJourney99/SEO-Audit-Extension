@@ -31,7 +31,10 @@
         "128": "icon128.png"
     },
     "host_permissions": [
-        "<all_urls>"
+        "*://*/*",
+        "http://*/*",
+        "https://*/*",
+        "https://chrome.google.com/*"
     ],
     "action": {
         "default_popup": "index.html",
