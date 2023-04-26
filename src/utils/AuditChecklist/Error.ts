@@ -135,7 +135,7 @@ export const BrokenInternalImage = async (
             }`;
         if (link?.length)
             parallelTasks.push(
-                fetch(link, { redirect: 'follow', method: 'HEAD' })
+                fetch(link, { redirect: 'follow', method: 'GET' })
             );
     }
 
