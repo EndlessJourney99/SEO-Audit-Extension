@@ -11,6 +11,8 @@ let headerTree: HTMLHeading[] = new Array<HTMLHeading>();
 let Meta: Omit<DocumentInfo, 'imageTags' | 'headerTree' | 'anchorTags'>;
 let imageTags: HTMLImage[];
 let anchorTags: HTMLAnchor[];
+let actionTags: Array<{ uniqueId: string; elementObj?: HTMLElement }> =
+    new Array();
 
 chrome.runtime.onMessage.addListener(async function (
     message: RequestMessage,
@@ -23,7 +25,7 @@ chrome.runtime.onMessage.addListener(async function (
             break;
         case 'HighlightElement':
             {
-                let element = anchorTags.find(
+                let element = actionTags.find(
                     (e) => e.uniqueId === message.OptionParameters.elementId
                 );
                 if (element && element.elementObj) {
@@ -33,7 +35,7 @@ chrome.runtime.onMessage.addListener(async function (
             break;
         case 'removeElementHighlight':
             {
-                let element = anchorTags.find(
+                let element = actionTags.find(
                     (e) => e.uniqueId === message.OptionParameters.elementId
                 );
                 if (element && element.elementObj) {
@@ -43,7 +45,7 @@ chrome.runtime.onMessage.addListener(async function (
             break;
         case 'ScrollToElem':
             {
-                const element = anchorTags.find(
+                const element = actionTags.find(
                     (e) => e.uniqueId === message.OptionParameters.elementId
                 );
                 if (element && element.elementObj)
@@ -69,6 +71,14 @@ function Init(sendResponse: (response: any) => void) {
         imageTags: imageTags,
         anchorTags: anchorTags,
     };
+    actionTags = [
+        ...headerTree.map((i) => {
+            return { uniqueId: i.uniqueId, elementObj: i.elementObj };
+        }),
+        ...anchorTags.map((i) => {
+            return { uniqueId: i.uniqueId, elementObj: i.elementObj };
+        }),
+    ];
     sendResponse(responseObj);
 }
 
@@ -126,7 +136,12 @@ const getAllAnchor = (): HTMLAnchor[] => {
     );
 
     return AnchorElements.filter(
-        (a) => a.href.length && a.href !== 'javascript:;'
+        (a) =>
+            a.href.length &&
+            a.href !== 'javascript:;' &&
+            !a.href.startsWith('tel:') &&
+            !a.href.startsWith('mailto:') &&
+            !a.href.startsWith('#')
     ).map<HTMLAnchor>((a) => {
         return {
             uniqueId: CreateGuid(),

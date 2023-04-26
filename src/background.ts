@@ -63,6 +63,9 @@ chrome.tabs.onRemoved.addListener((tabId, info) => {
     removeTabData(tabId);
 });
 
+chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
+    if (changeInfo.url === undefined) removeTabData(tabId);
+});
 // async function RunFetch(urls: Array<string>) {
 //     for (let i = 0; i < urls.length; i++) {}
 // }
