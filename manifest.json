@@ -7,9 +7,9 @@
         "tabs",
         "scripting",
         "declarativeNetRequest",
-        "desktopCapture",
         "browsingData",
-        "webRequest"
+        "webRequest",
+        "webNavigation"
     ],
     "content_scripts": [
         {
