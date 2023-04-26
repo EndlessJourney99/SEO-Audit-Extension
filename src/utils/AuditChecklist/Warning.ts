@@ -295,7 +295,11 @@ export const PageWithoutH1 = (DOM: Document): boolean => {
 export const MissingAltAttribute = (DOM: Document): number => {
     const allImgs = Array.from(DOM.querySelectorAll('img'));
 
-    return allImgs.filter((i) => i.alt.length === 0).length;
+    return allImgs.filter(
+        (i) =>
+            i.role !== 'presentation' &&
+            (i.alt === undefined || i.alt === null || i.alt.length === 0)
+    ).length;
 };
 
 // Unit test integrated
