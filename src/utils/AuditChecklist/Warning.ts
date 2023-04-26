@@ -187,7 +187,7 @@ export const BlockedInternalResourceInRobotsTxt = async (
 ) => {
     const robots = robotsParser({
         userAgent: userAgent, // The default user agent to use when looking for allow/disallow rules, if this agent isn't listed in the active robots.txt, we use *.
-        allowOnNeutral: false, // The value to use when the robots.txt rule's for allow and disallow are balanced on whether a link can be crawled.
+        allowOnNeutral: true, // The value to use when the robots.txt rule's for allow and disallow are balanced on whether a link can be crawled.
     });
 
     await robots.useRobotsFor(baseUrl.origin);
