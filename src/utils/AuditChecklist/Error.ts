@@ -6,8 +6,8 @@ import {
 } from './ChecklistUtils';
 
 // TESTED
-export const BrokenCanonical = async (document: Document) => {
-    const canonicalUrl = document.querySelector<HTMLLinkElement>(
+export const BrokenCanonical = async (DOM: Document) => {
+    const canonicalUrl = DOM.querySelector<HTMLLinkElement>(
         "link[rel='canonical']"
     )?.href;
     try {
@@ -24,11 +24,11 @@ export const BrokenCanonical = async (document: Document) => {
 
 // TESTED
 export const MultipleCanonicalUrl = (
-    document: Document,
+    DOM: Document,
     fetchResponse: Response
 ) => {
     const canonicalTags = Array.from(
-        document.querySelectorAll("link[rel='canonical']")
+        DOM.querySelectorAll("link[rel='canonical']")
     );
     if (canonicalTags.length >= 2) return true;
 
@@ -45,8 +45,8 @@ export const NonSecurePage = (fetchResponse: Response) => {
     return true;
 };
 
-export const MissConfiguredViewPort = (document: Document) => {
-    const viewPortTag = document.querySelector("meta[name='viewport']");
+export const MissConfiguredViewPort = (DOM: Document) => {
+    const viewPortTag = DOM.querySelector("meta[name='viewport']");
     if (viewPortTag) {
         const contentViewPort = viewPortTag.getAttribute('content');
         if (
@@ -61,16 +61,14 @@ export const MissConfiguredViewPort = (document: Document) => {
 };
 
 export const BrokenInternalJsAndCss = async (
-    document: Document,
+    DOM: Document,
     currentUrl: URL
 ) => {
-    const allScriptFiles = Array.from(
-        document.querySelectorAll('script')
-    ).filter((s) => s.src.length || s.getAttribute('data-src')?.length);
+    const allScriptFiles = Array.from(DOM.querySelectorAll('script')).filter(
+        (s) => s.src.length || s.getAttribute('data-src')?.length
+    );
     const allStylesheets = Array.from(
-        document.querySelectorAll<HTMLLinkElement>(
-            "link[rel='stylesheet'][href]"
-        )
+        DOM.querySelectorAll<HTMLLinkElement>("link[rel='stylesheet'][href]")
     );
 
     const internalScripts = allScriptFiles.filter(
@@ -110,11 +108,8 @@ export const BrokenInternalJsAndCss = async (
 };
 
 // TESTED
-export const BrokenInternalImage = async (
-    document: Document,
-    currentUrl: URL
-) => {
-    const allImgs = Array.from(document.querySelectorAll('img')).filter(
+export const BrokenInternalImage = async (DOM: Document, currentUrl: URL) => {
+    const allImgs = Array.from(DOM.querySelectorAll('img')).filter(
         (i) => i.src.length || i.getAttribute('data-src')?.length
     );
 
@@ -149,10 +144,10 @@ export const BrokenInternalImage = async (
 
 // TESTED
 export const BrokenInternalLinks = async (
-    document: Document,
+    DOM: Document,
     currentUrl: URL
 ): Promise<Array<string>> => {
-    const allLinks = Array.from(document.querySelectorAll('a')).filter(
+    const allLinks = Array.from(DOM.querySelectorAll('a')).filter(
         (i) =>
             i.href?.length &&
             !i.href?.startsWith('#') &&
@@ -184,9 +179,9 @@ export const BrokenInternalLinks = async (
 };
 
 // TESTED
-export const HrefLangValueIssue = (document: Document) => {
+export const HrefLangValueIssue = (DOM: Document) => {
     const hreflangTags = Array.from(
-        document.querySelectorAll("link[rel='alternate'][hreflang]")
+        DOM.querySelectorAll("link[rel='alternate'][hreflang]")
     );
     for (let i = 0; i < hreflangTags.length; i++) {
         const hreflangVal = hreflangTags[i].getAttribute('hreflang');
@@ -208,9 +203,9 @@ export const HrefLangValueIssue = (document: Document) => {
 };
 
 // TESTED
-export const IncorrectHreflangLink = async (document: Document) => {
+export const IncorrectHreflangLink = async (DOM: Document) => {
     const hreflangTags = Array.from(
-        document.querySelectorAll("link[rel='alternate'][hreflang]")
+        DOM.querySelectorAll("link[rel='alternate'][hreflang]")
     );
 
     let parallelTasks = new Array<Promise<Response>>();
@@ -226,29 +221,27 @@ export const IncorrectHreflangLink = async (document: Document) => {
 };
 
 // TESTED
-export const MixedContent = (document: Document) => {
+export const MixedContent = (DOM: Document) => {
     const mixedLinkMeta = Array.from(
-        document.querySelectorAll<HTMLLinkElement>(
-            'link:not([rel="stylesheet"])'
-        )
+        DOM.querySelectorAll<HTMLLinkElement>('link:not([rel="stylesheet"])')
     ).filter((l) => l.href.includes('http://'));
-    const mixedAnchor = Array.from(document.querySelectorAll('a')).filter((a) =>
+    const mixedAnchor = Array.from(DOM.querySelectorAll('a')).filter((a) =>
         a.href.includes('http://')
     );
-    const mixedJs = Array.from(document.querySelectorAll('script')).filter(
+    const mixedJs = Array.from(DOM.querySelectorAll('script')).filter(
         (s) =>
             s.src?.includes('http://') ||
             s.getAttribute('data-src')?.includes('http://')
     );
     const mixedCss = Array.from(
-        document.querySelectorAll<HTMLLinkElement>("link[rel='stylesheet']")
+        DOM.querySelectorAll<HTMLLinkElement>("link[rel='stylesheet']")
     ).filter((l) => l.href.includes('http://'));
-    const mixedImgs = Array.from(document.querySelectorAll('img')).filter(
+    const mixedImgs = Array.from(DOM.querySelectorAll('img')).filter(
         (i) =>
             i.src?.includes('http://') ||
             i.getAttribute('data-src')?.includes('http://')
     );
-    const mixedIframe = Array.from(document.querySelectorAll('iframe')).filter(
+    const mixedIframe = Array.from(DOM.querySelectorAll('iframe')).filter(
         (i) =>
             i.src?.includes('http://') ||
             i.getAttribute('data-src')?.includes('http://')
@@ -264,8 +257,8 @@ export const MixedContent = (document: Document) => {
     );
 };
 
-export const MissingTitleTag = (document: Document) => {
-    const titleTag = document.querySelector('title');
+export const MissingTitleTag = (DOM: Document) => {
+    const titleTag = DOM.querySelector('title');
     if (titleTag == null || !titleTag.textContent?.length) return true;
     return false;
 };

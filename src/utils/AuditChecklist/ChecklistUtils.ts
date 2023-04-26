@@ -92,13 +92,14 @@ export const GetRedirectionChain = async (url: URL) => {
 
 export const IsLinkInternal = (link: string, internalUrl: URL) => {
     if (link.length === 0) return false;
-    if (link.includes(internalUrl.hostname)) return true;
-    if (
-        link.startsWith('/') ||
-        (!link.includes('http') && !link.includes('www'))
-    )
+
+    try {
+        const urlConstruct = new URL(link);
+        if (urlConstruct.hostname === internalUrl.hostname) return true;
+        return false;
+    } catch {
         return true;
-    return false;
+    }
 };
 
 // prettier-ignore

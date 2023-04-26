@@ -156,6 +156,11 @@ const useWarningCheckList = () => {
                         );
 
                         let DOM = parser.parseFromString(response, 'text/html');
+
+                        DOM.querySelectorAll('base')?.forEach((item) =>
+                            item.remove()
+                        );
+
                         const baseTagElem = DOM.createElement('base');
                         baseTagElem.href = `${currentURL.protocol}//${currentURL.hostname}`;
                         DOM.head.appendChild(baseTagElem);

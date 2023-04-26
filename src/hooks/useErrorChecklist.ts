@@ -8,28 +8,25 @@ import { useIndexedDB } from './IndexedDB';
 import { storageName } from '../utils/GlobalUtils';
 import { DbSchema } from '../utils/IndexedDBConfig';
 
-const ProcessErrorList = async (document: Document, currentUrl: URL) => {
+const ProcessErrorList = async (DOM: Document, currentUrl: URL) => {
     const fetchResponse = await fetch(currentUrl);
     // DirectValue
-    const multipleCanonicalUrl = Error.MultipleCanonicalUrl(
-        document,
-        fetchResponse
-    );
+    const multipleCanonicalUrl = Error.MultipleCanonicalUrl(DOM, fetchResponse);
     const nonSecurePage = Error.NonSecurePage(fetchResponse);
-    const missConfiguredViewPort = Error.MissConfiguredViewPort(document);
-    const hrefLangValueIssue = Error.HrefLangValueIssue(document);
-    const mixedContent = Error.MixedContent(document);
-    const missingTitleTag = Error.MissingTitleTag(document);
+    const missConfiguredViewPort = Error.MissConfiguredViewPort(DOM);
+    const hrefLangValueIssue = Error.HrefLangValueIssue(DOM);
+    const mixedContent = Error.MixedContent(DOM);
+    const missingTitleTag = Error.MissingTitleTag(DOM);
 
     // Promise
-    const brokenCanonical = Error.BrokenCanonical(document);
+    const brokenCanonical = Error.BrokenCanonical(DOM);
     const brokenInternalJsAndCss = Error.BrokenInternalJsAndCss(
-        document,
+        DOM,
         currentUrl
     );
-    const brokenInternalImage = Error.BrokenInternalImage(document, currentUrl);
-    const brokenInternalLinks = Error.BrokenInternalLinks(document, currentUrl);
-    const IncorrectHreflangLink = Error.IncorrectHreflangLink(document);
+    const brokenInternalImage = Error.BrokenInternalImage(DOM, currentUrl);
+    const brokenInternalLinks = Error.BrokenInternalLinks(DOM, currentUrl);
+    const IncorrectHreflangLink = Error.IncorrectHreflangLink(DOM);
 
     const [
         brokenCanonicalResult,
@@ -104,6 +101,11 @@ const useErrorChecklist = () => {
                         );
 
                         let DOM = parser.parseFromString(response, 'text/html');
+
+                        DOM.querySelectorAll('base')?.forEach((item) =>
+                            item.remove()
+                        );
+
                         const baseTagElem = DOM.createElement('base');
                         baseTagElem.href = `${currentURL.protocol}//${currentURL.hostname}`;
                         DOM.head.appendChild(baseTagElem);
