@@ -6,7 +6,7 @@ import { chromeSignal } from './signals/globalSignal';
 import { initDB } from './hooks/IndexedDB';
 import { DBConfig } from './utils/IndexedDBConfig';
 
-initDB(DBConfig);
+await initDB(DBConfig);
 const globalStateInit = await chromeSignal();
 render(
     <AppState.Provider value={globalStateInit}>

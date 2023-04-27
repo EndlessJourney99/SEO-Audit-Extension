@@ -48,31 +48,41 @@ export function CreateObjectStore(
     dbName: string,
     version: number,
     storeSchemas: ObjectStoreMeta[]
-) {
-    const request: IDBOpenDBRequest = indexedDBFactory.open(dbName, version);
+): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+        const request: IDBOpenDBRequest = indexedDBFactory.open(
+            dbName,
+            version
+        );
 
-    request.onupgradeneeded = function (event: IDBVersionChangeEvent) {
-        const database: IDBDatabase = (event.target as any).result;
-        storeSchemas.forEach((storeSchema: ObjectStoreMeta) => {
-            if (!database.objectStoreNames.contains(storeSchema.store)) {
-                const objectStore = database.createObjectStore(
-                    storeSchema.store,
-                    storeSchema.storeConfig
-                );
-                storeSchema.storeSchema.forEach((schema: ObjectStoreSchema) => {
-                    objectStore.createIndex(
-                        schema.name,
-                        schema.keypath,
-                        schema.options
+        request.onupgradeneeded = function (event: IDBVersionChangeEvent) {
+            const database: IDBDatabase = (event.target as any).result;
+            storeSchemas.forEach((storeSchema: ObjectStoreMeta) => {
+                if (!database.objectStoreNames.contains(storeSchema.store)) {
+                    const objectStore = database.createObjectStore(
+                        storeSchema.store,
+                        storeSchema.storeConfig
                     );
-                });
-            }
-        });
-        database.close();
-    };
-    request.onsuccess = function (e: any) {
-        e.target.result.close();
-    };
+                    storeSchema.storeSchema.forEach(
+                        (schema: ObjectStoreSchema) => {
+                            objectStore.createIndex(
+                                schema.name,
+                                schema.keypath,
+                                schema.options
+                            );
+                        }
+                    );
+                }
+            });
+            database.close();
+            resolve();
+        };
+
+        request.onsuccess = function (e: any) {
+            e.target.result.close();
+            resolve();
+        };
+    });
 }
 
 export function DBOperations(

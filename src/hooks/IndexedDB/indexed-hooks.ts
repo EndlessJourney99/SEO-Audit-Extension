@@ -38,11 +38,15 @@ let indexeddbConfiguration: { version: number; name: string } = {
     name: '',
 };
 
-export function initDB({ name, version, objectStoresMeta }: IndexedDBProps) {
+export async function initDB({
+    name,
+    version,
+    objectStoresMeta,
+}: IndexedDBProps) {
     indexeddbConfiguration.name = name;
     indexeddbConfiguration.version = version;
     Object.freeze(indexeddbConfiguration);
-    CreateObjectStore(name, version, objectStoresMeta);
+    await CreateObjectStore(name, version, objectStoresMeta);
 }
 
 export function useIndexedDB(objectStore: string): {
