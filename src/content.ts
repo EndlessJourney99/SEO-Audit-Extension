@@ -191,7 +191,7 @@ function removeHighlight(element: HTMLElement) {
 function scrollToElem(element: HTMLElement) {
     element.scrollIntoView({
         behavior: 'smooth',
-        block: 'nearest',
+        block: 'center',
         inline: 'nearest',
     });
     // const yOffset = -800;
