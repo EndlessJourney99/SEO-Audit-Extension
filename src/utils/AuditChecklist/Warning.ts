@@ -1,7 +1,7 @@
 import { convert } from 'html-to-text';
 
 import robotsParser from '../CustomRobotParser';
-import { GetRedirectionChain } from './ChecklistUtils';
+import { GetRedirectionChain, IsLinkInternal } from './ChecklistUtils';
 import { isValidUrl } from '../GlobalUtils';
 
 // Unit test integrated
@@ -20,10 +20,10 @@ export const BrokenExternalImages = async (
 
     const externalImg = allImgs.filter(
         (i) =>
-            !i.src.includes(currentUrl.hostname) &&
-            !i.getAttribute('data-src')?.includes(currentUrl.hostname) &&
-            (i.src.includes('http') ||
-                i.getAttribute('data-src')?.includes('http'))
+            !IsLinkInternal(i.src, currentUrl) &&
+            !IsLinkInternal(i.getAttribute('data-src') ?? '', currentUrl) &&
+            (i.src.startsWith('http') ||
+                i.getAttribute('data-src')?.startsWith('http'))
     );
 
     let fetchedLink = new Array<string>();

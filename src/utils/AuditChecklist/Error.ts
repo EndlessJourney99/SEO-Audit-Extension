@@ -244,25 +244,25 @@ export const MixedContent = (DOM: Document) => {
         DOM.querySelectorAll<HTMLLinkElement>('link:not([rel="stylesheet"])')
     ).filter((l) => l.href.includes('http://'));
     const mixedAnchor = Array.from(DOM.querySelectorAll('a')).filter((a) =>
-        a.href.includes('http://')
+        a.href.startsWith('http://')
     );
     const mixedJs = Array.from(DOM.querySelectorAll('script')).filter(
         (s) =>
-            s.src?.includes('http://') ||
-            s.getAttribute('data-src')?.includes('http://')
+            s.src?.startsWith('http://') ||
+            s.getAttribute('data-src')?.startsWith('http://')
     );
     const mixedCss = Array.from(
         DOM.querySelectorAll<HTMLLinkElement>("link[rel='stylesheet']")
     ).filter((l) => l.href.includes('http://'));
     const mixedImgs = Array.from(DOM.querySelectorAll('img')).filter(
         (i) =>
-            i.src?.includes('http://') ||
-            i.getAttribute('data-src')?.includes('http://')
+            i.src?.startsWith('http://') ||
+            i.getAttribute('data-src')?.startsWith('http://')
     );
     const mixedIframe = Array.from(DOM.querySelectorAll('iframe')).filter(
         (i) =>
-            i.src?.includes('http://') ||
-            i.getAttribute('data-src')?.includes('http://')
+            i.src?.startsWith('http://') ||
+            i.getAttribute('data-src')?.startsWith('http://')
     );
 
     return (

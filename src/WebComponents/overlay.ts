@@ -29,4 +29,4 @@ class Overlay extends HTMLElement {
         this.realOverlay.remove();
     }
 }
-window.customElements.define('overlay-component', Overlay);
+customElements.define('overlay-component', Overlay);
