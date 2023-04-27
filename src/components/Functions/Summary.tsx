@@ -111,7 +111,7 @@ const Summary = ({ docsInfo }: props) => {
                     </tr>
                 </tbody>
             </table>
-            {/* <hr className="py-2" />
+            <hr className="py-2" />
             <table className="table-auto w-full text-left">
                 <thead className="border-b border-green-600 [&>tr>th]:pb-2">
                     <tr>
@@ -155,7 +155,7 @@ const Summary = ({ docsInfo }: props) => {
                         <td>{docsInfo.value?.anchorTags.length}</td>
                     </tr>
                 </tbody>
-            </table> */}
+            </table>
         </section>
     );
 };

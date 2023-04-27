@@ -62,6 +62,24 @@ const noFollowLinks = (links: HTMLAnchor[] | undefined): Array<HTMLAnchor> => {
     return noFollowLinks;
 };
 
+const constructListRel = (relStr: string) => {
+    return relStr.split(' ').map<JSX.Element>((val, i, arr) => {
+        if (val.indexOf('nofollow') > -1)
+            return (
+                <>
+                    <span className="font-bold">{val}</span>
+                    {i < arr.length - 1 ? ', ' : ''}
+                </>
+            );
+
+        return (
+            <>
+                <span>{val}</span> {i < arr.length - 1 ? ', ' : ''}
+            </>
+        );
+    });
+};
+
 const LinkDiagnostic = ({ docsInfo }: props) => {
     const state: GlobalSignal = useContext(AppState);
 
@@ -102,7 +120,7 @@ const LinkDiagnostic = ({ docsInfo }: props) => {
                 </tbody>
             </table>
 
-            <hr className="py-2" />
+            {/* <hr className="py-2" />
 
             <Accordion isOpen={false} className="pb-4">
                 <AccordionHeader>
@@ -141,7 +159,7 @@ const LinkDiagnostic = ({ docsInfo }: props) => {
                         ))}
                     </ul>
                 </AccordionBody>
-            </Accordion>
+            </Accordion> */}
 
             <hr className="py-2" />
 
@@ -153,34 +171,43 @@ const LinkDiagnostic = ({ docsInfo }: props) => {
                     </span>
                 </AccordionHeader>
                 <AccordionBody className="max-h-[300px] overflow-y-scroll scrollbar-thin scrollbar-thumb-gray-500 scrollbar-thumb-rounded-full">
-                    <ul className="whitespace-normal break-all [&>li]:pb-1 list-decimal list-inside [&>li]:cursor-pointer">
-                        {ComputedExternalLinks.value.map((item) => (
-                            <li
-                                onMouseOver={() =>
-                                    TriggerHighlight(
-                                        item.uniqueId,
-                                        state.tabInfo.value.id ?? -1,
-                                        true
-                                    )
-                                }
-                                onMouseLeave={() =>
-                                    TriggerHighlight(
-                                        item.uniqueId,
-                                        state.tabInfo.value.id ?? -1,
-                                        false
-                                    )
-                                }
-                                onClick={() =>
-                                    ScrollToElem(
-                                        item.uniqueId,
-                                        state.tabInfo.value.id ?? -1
-                                    )
-                                }
-                            >
-                                {item.representString}
-                            </li>
-                        ))}
-                    </ul>
+                    <table className="table-fixed w-full [&>thead>tr>td]:font-bold [&>thead>tr>td]:border-r [&>thead>tr>td]:px-2 [&>tbody>tr>td:first-child]:border-r [&>tbody>tr]:cursor-pointer [&>tbody>tr:hover]:bg-blue-300 [&>tbody>tr>td]:px-2 [&>tbody>tr>td:first-child]:break-all [&>tbody>tr>td:nth-child(2)]:italic">
+                        <thead>
+                            <tr>
+                                <td className="w-3/5">URL</td>
+                                <td>Rel</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {ComputedExternalLinks.value.map((item) => (
+                                <tr
+                                    onMouseOver={() =>
+                                        TriggerHighlight(
+                                            item.uniqueId,
+                                            state.tabInfo.value.id ?? -1,
+                                            true
+                                        )
+                                    }
+                                    onMouseLeave={() =>
+                                        TriggerHighlight(
+                                            item.uniqueId,
+                                            state.tabInfo.value.id ?? -1,
+                                            false
+                                        )
+                                    }
+                                    onClick={() =>
+                                        ScrollToElem(
+                                            item.uniqueId,
+                                            state.tabInfo.value.id ?? -1
+                                        )
+                                    }
+                                >
+                                    <td>{item.href}</td>
+                                    <td>{constructListRel(item.rel)}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
                 </AccordionBody>
             </Accordion>
 
@@ -194,34 +221,43 @@ const LinkDiagnostic = ({ docsInfo }: props) => {
                     </span>
                 </AccordionHeader>
                 <AccordionBody className="max-h-[300px] overflow-y-scroll scrollbar-thin scrollbar-thumb-gray-500 scrollbar-thumb-rounded-full">
-                    <ul className="whitespace-normal break-all [&>li]:pb-2 list-decimal list-inside [&>li]:cursor-pointer">
-                        {ComputedInternalLinks.value.map((item) => (
-                            <li
-                                onMouseOver={() =>
-                                    TriggerHighlight(
-                                        item.uniqueId,
-                                        state.tabInfo.value.id ?? -1,
-                                        true
-                                    )
-                                }
-                                onMouseLeave={() =>
-                                    TriggerHighlight(
-                                        item.uniqueId,
-                                        state.tabInfo.value.id ?? -1,
-                                        false
-                                    )
-                                }
-                                onClick={() =>
-                                    ScrollToElem(
-                                        item.uniqueId,
-                                        state.tabInfo.value.id ?? -1
-                                    )
-                                }
-                            >
-                                {item.representString}
-                            </li>
-                        ))}
-                    </ul>
+                    <table className="table-fixed w-full [&>thead>tr>td]:font-bold [&>thead>tr>td]:border-r [&>thead>tr>td]:px-2 [&>tbody>tr>td:first-child]:border-r [&>tbody>tr]:cursor-pointer [&>tbody>tr:hover]:bg-blue-300 [&>tbody>tr>td]:px-2 [&>tbody>tr>td:first-child]:break-all [&>tbody>tr>td:nth-child(2)]:italic">
+                        <thead>
+                            <tr>
+                                <td className="w-3/5">URL</td>
+                                <td>Rel</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {ComputedInternalLinks.value.map((item) => (
+                                <tr
+                                    onMouseOver={() =>
+                                        TriggerHighlight(
+                                            item.uniqueId,
+                                            state.tabInfo.value.id ?? -1,
+                                            true
+                                        )
+                                    }
+                                    onMouseLeave={() =>
+                                        TriggerHighlight(
+                                            item.uniqueId,
+                                            state.tabInfo.value.id ?? -1,
+                                            false
+                                        )
+                                    }
+                                    onClick={() =>
+                                        ScrollToElem(
+                                            item.uniqueId,
+                                            state.tabInfo.value.id ?? -1
+                                        )
+                                    }
+                                >
+                                    <td>{item.href}</td>
+                                    <td>{constructListRel(item.rel)}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
                 </AccordionBody>
             </Accordion>
         </section>

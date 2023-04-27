@@ -140,6 +140,8 @@ const getAllAnchor = (): HTMLAnchor[] => {
         (a) =>
             a.href.length &&
             a.href !== 'javascript:;' &&
+            a.href !== 'javascript:(0)' &&
+            a.href !== 'javascript:void(0)' &&
             !a.href.startsWith('tel:') &&
             !a.href.startsWith('mailto:') &&
             !a.href.startsWith('#')
@@ -189,9 +191,13 @@ function removeHighlight(element: HTMLElement) {
 function scrollToElem(element: HTMLElement) {
     element.scrollIntoView({
         behavior: 'smooth',
-        block: 'center',
+        block: 'nearest',
         inline: 'nearest',
     });
+    // const yOffset = -800;
+    // const y =
+    //     element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+    // window.scrollTo({ top: y, behavior: 'smooth' });
 }
 
 function CrawlCurrentHTML() {

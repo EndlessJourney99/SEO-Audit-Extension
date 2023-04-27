@@ -4,7 +4,6 @@ import Header from './components/Header';
 import Functions from './components/Functions';
 import Footer from './components/Footer';
 import { GlobalSignal } from './signals/globalSignal';
-import { BackgroundMessage } from './types/Execution';
 
 export const App = () => {
     const state: GlobalSignal = useContext(AppState);
@@ -20,7 +19,7 @@ export const App = () => {
     }, []);
 
     return (
-        <div className="container mx-auto">
+        <div className="container-custom px-10 py-5 mx-auto">
             <Header
                 title={state.manifest.value.name}
                 version={state.manifest.value.version}

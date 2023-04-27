@@ -131,7 +131,7 @@ const useErrorChecklist = () => {
                 );
             }
         });
-    }, [state.updateSignal.value]);
+    }, []);
     return { errorCheckList, isLoading };
 };
 

@@ -91,6 +91,7 @@ const useInit = (tabInfo: chrome.tabs.Tab, updateSignal: number) => {
 
     const initFunc = () => {
         IsProcessing.value = true;
+        savedActiveTab.value = null;
         try {
             getByID<DbSchema>(tabInfo.id ?? -1).then(async (data) => {
                 if (!data) {
@@ -99,6 +100,13 @@ const useInit = (tabInfo: chrome.tabs.Tab, updateSignal: number) => {
                     await initData(true);
                 } else {
                     docsInfo.value = data.DocumentInfo;
+                    docsInfo.value.countHeader = function (
+                        tagName: TagName
+                    ): number {
+                        return this.headerTree?.filter(
+                            (h) => h.tagName === TagName[tagName]
+                        ).length;
+                    };
                     savedActiveTab.value = data.ActiveTab ?? null;
                 }
                 IsProcessing.value = false;
