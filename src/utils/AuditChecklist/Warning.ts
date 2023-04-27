@@ -26,15 +26,19 @@ export const BrokenExternalImages = async (
                 i.getAttribute('data-src')?.includes('http'))
     );
 
+    let fetchedLink = new Array<string>();
     let parallelTasks = new Array<Promise<Response>>();
     for (let i = 0; i < externalImg.length; i++) {
         const url = externalImg[i].getAttribute('src')?.length
             ? externalImg[i].getAttribute('src')
             : externalImg[i].getAttribute('data-src');
-        if (url?.length && isValidUrl(url))
+
+        if (url?.length && isValidUrl(url) && !fetchedLink.includes(url)) {
             parallelTasks.push(
                 fetch(url, { redirect: 'follow', method: 'GET' })
             );
+            fetchedLink.push(url);
+        }
     }
 
     const responses = await Promise.all(
@@ -72,13 +76,16 @@ export const BrokenExternalLinks = async (
         }
     });
 
+    let fetchedLink = new Array<string>();
     let parallelTasks = new Array<Promise<Response>>();
     for (let i = 0; i < externalLinks.length; i++) {
         const url = externalLinks[i].getAttribute('href');
-        if (url?.length && isValidUrl(url))
+        if (url?.length && isValidUrl(url) && !fetchedLink.includes(url)) {
             parallelTasks.push(
                 fetch(url, { redirect: 'follow', method: 'GET' })
             );
+            fetchedLink.push(url);
+        }
     }
     const responses = await Promise.all(
         parallelTasks.map((t) =>

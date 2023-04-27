@@ -81,24 +81,35 @@ export const BrokenInternalJsAndCss = async (
         (s) => s.href && IsLinkInternal(s.href, currentUrl)
     );
 
+    let fetchedLink = new Array<string>();
     let parallelTasks = new Array<Promise<Response>>();
     for (let i = 0; i < internalScripts.length; i++) {
         let link =
             internalScripts[i].src ??
             internalScripts[i].getAttribute('data-src');
-        if (!link.includes('http') && !link.includes('www'))
+        if (!link.includes('http') && !link.includes('www')) {
             link = `${currentUrl.protocol}//${currentUrl.hostname}/${
                 link.startsWith('/') ? link.substring(1) : link
             }`;
-        parallelTasks.push(fetch(link));
+        }
+
+        if (!fetchedLink.includes(link)) {
+            fetchedLink.push(link);
+            parallelTasks.push(fetch(link));
+        }
     }
     for (let i = 0; i < internalStylesheets.length; i++) {
         let link = internalStylesheets[i].href ?? '';
-        if (!link.includes('http') && !link.includes('www'))
+        if (!link.includes('http') && !link.includes('www')) {
             link = `${currentUrl.protocol}//${currentUrl.hostname}/${
                 link.startsWith('/') ? link.substring(1) : link
             }`;
-        parallelTasks.push(fetch(link));
+        }
+
+        if (!fetchedLink.includes(link)) {
+            fetchedLink.push(link);
+            parallelTasks.push(fetch(link));
+        }
     }
 
     const responses = await Promise.all(
@@ -120,6 +131,7 @@ export const BrokenInternalImage = async (DOM: Document, currentUrl: URL) => {
                 IsLinkInternal(i.getAttribute('data-src') ?? '', currentUrl))
     );
 
+    let fetchedLink = new Array<string>();
     let parallelTasks = new Array<Promise<Response>>();
     for (let i = 0; i < internalImg.length; i++) {
         let link =
@@ -128,10 +140,13 @@ export const BrokenInternalImage = async (DOM: Document, currentUrl: URL) => {
             link = `${currentUrl.protocol}//${currentUrl.hostname}/${
                 link.startsWith('/') ? link.substring(1) : link
             }`;
-        if (link?.length)
+
+        if (link?.length && !fetchedLink.includes(link)) {
+            fetchedLink.push(link);
             parallelTasks.push(
                 fetch(link, { redirect: 'follow', method: 'GET' })
             );
+        }
     }
 
     const responses = await Promise.all(
@@ -157,6 +172,7 @@ export const BrokenInternalLinks = async (
         (i) => i.href && IsLinkInternal(i.href, currentUrl)
     );
 
+    let fetchedLink = new Array<string>();
     let parallelTasks = new Array<Promise<Response>>();
     for (let i = 0; i < internalLinks.length; i++) {
         let url = internalLinks[i].getAttribute('href');
@@ -164,10 +180,12 @@ export const BrokenInternalLinks = async (
             url = `${currentUrl.protocol}//${currentUrl.hostname}/${
                 url.startsWith('/') ? url.substring(1) : url
             }`;
-        if (url?.length)
+        if (url?.length && !fetchedLink.includes(url)) {
+            fetchedLink.push(url);
             parallelTasks.push(
                 fetch(url, { redirect: 'follow', method: 'GET' })
             );
+        }
     }
 
     const responses = await Promise.all(
