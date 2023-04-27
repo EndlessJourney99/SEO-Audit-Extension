@@ -190,7 +190,7 @@ function scrollToElem(element: HTMLElement) {
     element.scrollIntoView({
         behavior: 'smooth',
         block: 'center',
-        inline: 'center',
+        inline: 'nearest',
     });
 }
 
