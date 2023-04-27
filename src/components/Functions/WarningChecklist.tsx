@@ -46,10 +46,7 @@ const WarningChecklist = () => {
                 <tr>
                     <td>{index}</td>
                     <td>IFrame Content Used</td>
-                    <td>
-                        Using IFrame content could potentially expose your
-                        website vulnerability.
-                    </td>
+                    <td></td>
                 </tr>
             );
             index++;
