@@ -60,29 +60,34 @@ const ProcessErrorList = async (DOM: Document, currentUrl: URL) => {
 };
 export type ErrorListType = Awaited<ReturnType<typeof ProcessErrorList>>;
 
+const updateErrorList = async (
+    getByID: <T = any>(id: string | number) => Promise<T>,
+    update: <T = any>(value: T, key?: any) => Promise<any>,
+    tabId: number,
+    val: ErrorListType
+) => {
+    getByID<DbSchema>(tabId).then(async (data) => {
+        if (data) {
+            update<DbSchema>({
+                ...data,
+                ErrorList: val,
+            }).then(
+                (id) => {
+                    console.log(`updated : ID ${id}`);
+                },
+                (error) => {
+                    console.error(`Failed to updated : ${error}`);
+                }
+            );
+        }
+    });
+};
+
 const useErrorChecklist = () => {
     const state: GlobalSignal = useContext(AppState);
     const { getByID, update } = useIndexedDB(storageName);
     const errorCheckList = useSignal({} as ErrorListType);
     const isLoading = useSignal(false);
-
-    const updateErrorList = async (val: ErrorListType) => {
-        getByID<DbSchema>(state.tabInfo.value.id ?? -1).then(async (data) => {
-            if (data) {
-                update<DbSchema>({
-                    ...data,
-                    ErrorList: val,
-                }).then(
-                    (id) => {
-                        console.log(`updated : ID ${id}`);
-                    },
-                    (error) => {
-                        console.error(`Failed to updated : ${error}`);
-                    }
-                );
-            }
-        });
-    };
 
     useEffect(() => {
         isLoading.value = true;
@@ -113,7 +118,12 @@ const useErrorChecklist = () => {
                         if (DOM) {
                             ProcessErrorList(DOM, currentURL).then((val) => {
                                 errorCheckList.value = val;
-                                updateErrorList(val);
+                                updateErrorList(
+                                    getByID,
+                                    update,
+                                    state.tabInfo.value.id ?? -1,
+                                    val
+                                );
                                 isLoading.value = false;
                             });
                         }
@@ -121,8 +131,6 @@ const useErrorChecklist = () => {
                 );
             }
         });
-
-        console.log('i fire once');
     }, [state.updateSignal.value]);
     return { errorCheckList, isLoading };
 };

@@ -13,8 +13,8 @@ const Header = ({ title, version }: props) => {
     const state: GlobalSignal = useContext(AppState);
     const { clear } = useIndexedDB(storageName);
 
-    const cleanDB = () => {
-        clear();
+    const cleanDB = async () => {
+        await clear();
         state.updateSignal.value += 1;
     };
 
