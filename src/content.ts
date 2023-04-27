@@ -6,6 +6,7 @@ import {
     RequestMessage,
 } from './types/Execution';
 import { CreateGuid } from './utils/GlobalUtils';
+import './WebComponents/overlay';
 
 let headerTree: HTMLHeading[] = new Array<HTMLHeading>();
 let Meta: Omit<DocumentInfo, 'imageTags' | 'headerTree' | 'anchorTags'>;
@@ -155,30 +156,33 @@ const getAllAnchor = (): HTMLAnchor[] => {
 };
 
 function highlight(element: HTMLElement) {
+    const overlayComponent = document.createElement('overlay-component');
+
     let isHighligh = element.getAttribute('is-highlight');
     if (isHighligh) return;
     let defaultBG = element.style.backgroundColor;
     let defaultTransition = element.style.transition;
 
-    element.style.transition = 'background 0.3s';
-    element.style.backgroundColor = '#a0c5e8b8';
+    // element.style.transition = 'background 0.3s';
+    // element.style.backgroundColor = '#a0c5e8b8';
 
     element.setAttribute('is-highlight', 'true');
-    element.setAttribute('default-color', defaultBG);
-    element.setAttribute('default-transition', defaultTransition);
+    element.appendChild(overlayComponent);
+    // element.setAttribute('default-color', defaultBG);
+    // element.setAttribute('default-transition', defaultTransition);
 }
 
 function removeHighlight(element: HTMLElement) {
     let isHighligh = element.getAttribute('is-highlight');
-    let defaultBG = element.getAttribute('default-color');
-    let defaultTransition = element.getAttribute('default-transition');
-    if (isHighligh && defaultBG != null && defaultTransition != null) {
-        element.style.backgroundColor = defaultBG;
-        element.style.transition = defaultTransition;
-
+    // let defaultBG = element.getAttribute('default-color');
+    // let defaultTransition = element.getAttribute('default-transition');
+    if (isHighligh) {
+        // element.style.backgroundColor = defaultBG;
+        // element.style.transition = defaultTransition;
+        element.querySelector('overlay-component')?.remove();
         element.removeAttribute('is-highlight');
-        element.removeAttribute('default-color');
-        element.removeAttribute('default-transition');
+        // element.removeAttribute('default-color');
+        // element.removeAttribute('default-transition');
     }
 }
 
