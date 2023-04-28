@@ -4,6 +4,7 @@ import Warning from '@mui/icons-material/Warning';
 import Link from '@mui/icons-material/Link';
 import Error from '@mui/icons-material/Error';
 import Robot from '@mui/icons-material/SmartToy';
+import Image from '@mui/icons-material/Image';
 import ViewHeadline from '@mui/icons-material/ViewHeadline';
 import TabPanel from '../Tabs/TabPanel';
 import Summary from './Summary';
@@ -14,8 +15,9 @@ import { useContext } from 'preact/hooks';
 import { AppState } from '../../signals/globalContext';
 import WarningChecklist from './WarningChecklist';
 import ErrorCheckList from './ErrorChecklist';
-import LinkDiagnostic from './LinkDiagnostic';
+import LinkAnalysis from './LinkAnalysis';
 import HeaderTree from './HeaderTree';
+import ImageAnalysis from './ImageAnalysis';
 
 const Functions = () => {
     const state: GlobalSignal = useContext(AppState);
@@ -63,7 +65,14 @@ const Functions = () => {
                     tabKey="LinkDiagnostic"
                     callBack={UpdateActiveTab}
                 >
-                    Link Diagnostic
+                    Link Analysis
+                </Tab>
+                <Tab
+                    icon={<Image />}
+                    tabKey="ImageAnalysis"
+                    callBack={UpdateActiveTab}
+                >
+                    Image Analysis
                 </Tab>
                 <Tab
                     icon={<Robot />}
@@ -102,7 +111,13 @@ const Functions = () => {
                     tabKey="LinkDiagnostic"
                     className="p-4 rounded-lg bg-gray-50"
                 >
-                    <LinkDiagnostic docsInfo={docsInfo} />
+                    <LinkAnalysis docsInfo={docsInfo} />
+                </TabPanel>
+                <TabPanel
+                    tabKey="ImageAnalysis"
+                    className="p-4 rounded-lg bg-gray-50"
+                >
+                    <ImageAnalysis docsInfo={docsInfo} />
                 </TabPanel>
                 <TabPanel
                     tabKey="BotRender"

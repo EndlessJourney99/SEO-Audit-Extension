@@ -20,6 +20,7 @@
         "html-to-text": "^9.0.5",
         "html2canvas": "^1.4.1",
         "preact": "^10.13.0",
+        "react-loading-skeleton": "^3.2.1",
         "robots-txt-parser": "^2.0.3"
     },
     "devDependencies": {

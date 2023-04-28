@@ -80,7 +80,7 @@ const constructListRel = (relStr: string) => {
     });
 };
 
-const LinkDiagnostic = ({ docsInfo }: props) => {
+const LinkAnalysis = ({ docsInfo }: props) => {
     const state: GlobalSignal = useContext(AppState);
 
     const ComputedNoFollowLinks = computed(() =>
@@ -264,4 +264,4 @@ const LinkDiagnostic = ({ docsInfo }: props) => {
     );
 };
 
-export default LinkDiagnostic;
+export default LinkAnalysis;

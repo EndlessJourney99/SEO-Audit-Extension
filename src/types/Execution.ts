@@ -36,10 +36,14 @@ interface HTMLHeading {
 }
 
 interface HTMLImage {
+    uniqueId: string;
     src: string;
     alt: string;
     title: string;
     name: string;
+    width: number;
+    height: number;
+    elementObj?: HTMLElement;
 }
 
 interface HTMLAnchor {

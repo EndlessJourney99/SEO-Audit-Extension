@@ -79,6 +79,9 @@ function Init(sendResponse: (response: any) => void) {
         ...anchorTags.map((i) => {
             return { uniqueId: i.uniqueId, elementObj: i.elementObj };
         }),
+        ...imageTags.map((i) => {
+            return { uniqueId: i.uniqueId, elementObj: i.elementObj };
+        }),
     ];
     sendResponse(responseObj);
 }
@@ -126,8 +129,23 @@ const getAllImageTag = (): HTMLImage[] => {
         document.querySelectorAll<HTMLImageElement>('img')
     );
 
-    return ImageElements.filter((i) => i.src.length).map<HTMLImage>((i) => {
-        return { src: i.src, alt: i.alt, name: i.name, title: i.title };
+    return ImageElements.filter(
+        (i) => i.src.length || i.getAttribute('data-src')?.length
+    ).map<HTMLImage>((i) => {
+        return {
+            uniqueId: CreateGuid(),
+            src: i.src ?? i.getAttribute('data-src'),
+            alt: i.alt,
+            name: i.name,
+            title: i.title,
+            width: i.getAttribute('width')
+                ? parseInt(i.getAttribute('width')!)
+                : NaN,
+            height: i.getAttribute('height')
+                ? parseInt(i.getAttribute('height')!)
+                : NaN,
+            elementObj: i,
+        };
     });
 };
 
