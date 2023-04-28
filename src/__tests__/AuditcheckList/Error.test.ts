@@ -81,18 +81,20 @@ describe('BrokenInternalImage', () => {
                             ...({} as Response),
                             status: 404,
                             ok: false,
+                            url: input.toString(),
                         });
                     else
                         return Promise.resolve<Response>({
                             ...({} as Response),
                             status: 200,
                             ok: true,
+                            url: input.toString(),
                         });
                 }
             );
     });
 
-    it('must have 30 internal broken images', async () => {
+    it('must have 30 broken internal images', async () => {
         const {
             window: { document },
         } = new JSDOM(Acc);
@@ -120,18 +122,20 @@ describe('BrokenInternalLink', () => {
                             ...({} as Response),
                             status: 404,
                             ok: false,
+                            url: input.toString(),
                         });
                     else
                         return Promise.resolve<Response>({
                             ...({} as Response),
                             status: 200,
                             ok: true,
+                            url: input.toString(),
                         });
                 }
             );
     });
 
-    it('must have 30 internal broken links', async () => {
+    it('must have 30 broken internal links', async () => {
         const {
             window: { document },
         } = new JSDOM(Acc);

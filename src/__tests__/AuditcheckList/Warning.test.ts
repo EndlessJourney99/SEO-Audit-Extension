@@ -157,6 +157,7 @@ describe('BrokenExternalImages', () => {
                         ...({} as Response),
                         status: 404,
                         ok: false,
+                        url: input.toString(),
                     });
                 else if (
                     input.toString().match(/https:\/\/example.com\/image\/*/m)
@@ -165,12 +166,14 @@ describe('BrokenExternalImages', () => {
                         ...({} as Response),
                         status: 404,
                         ok: false,
+                        url: input.toString(),
                     });
                 else
                     return Promise.resolve<Response>({
                         ...({} as Response),
                         status: 200,
                         ok: true,
+                        url: input.toString(),
                     });
             }
         );

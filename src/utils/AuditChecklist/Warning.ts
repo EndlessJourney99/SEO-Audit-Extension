@@ -33,10 +33,11 @@ export const BrokenExternalImages = async (
             ? externalImg[i].getAttribute('src')
             : externalImg[i].getAttribute('data-src');
 
-        if (url?.length && isValidUrl(url) && !fetchedLink.includes(url)) {
-            parallelTasks.push(
-                fetch(url, { redirect: 'follow', method: 'GET' })
-            );
+        if (url?.length && isValidUrl(url)) {
+            if (!fetchedLink.includes(url))
+                parallelTasks.push(
+                    fetch(url, { redirect: 'follow', method: 'GET' })
+                );
             fetchedLink.push(url);
         }
     }
@@ -49,9 +50,10 @@ export const BrokenExternalImages = async (
             })
         )
     );
-    return responses
+    const failedURL = responses
         .filter((r) => !(r instanceof Error) && !r.ok)
         .map((r) => r.url);
+    return fetchedLink.filter((l) => failedURL.indexOf(l) > -1);
 };
 
 // Unit test integrated

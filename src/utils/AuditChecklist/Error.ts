@@ -141,20 +141,23 @@ export const BrokenInternalImage = async (DOM: Document, currentUrl: URL) => {
                 link.startsWith('/') ? link.substring(1) : link
             }`;
 
-        if (link?.length && !fetchedLink.includes(link)) {
+        if (link?.length) {
+            if (!fetchedLink.includes(link))
+                parallelTasks.push(
+                    fetch(link, { redirect: 'follow', method: 'GET' })
+                );
             fetchedLink.push(link);
-            parallelTasks.push(
-                fetch(link, { redirect: 'follow', method: 'GET' })
-            );
         }
     }
 
     const responses = await Promise.all(
         parallelTasks.map((t) => t.catch((e) => e))
     );
-    return responses
+    const failedURLs = responses
         .filter((r) => !(r instanceof Error) && !r.ok)
         .map((r) => r.url);
+
+    return fetchedLink.filter((l) => failedURLs.indexOf(l) > -1);
 };
 
 // TESTED
@@ -180,20 +183,22 @@ export const BrokenInternalLinks = async (
             url = `${currentUrl.protocol}//${currentUrl.hostname}/${
                 url.startsWith('/') ? url.substring(1) : url
             }`;
-        if (url?.length && !fetchedLink.includes(url)) {
+        if (url?.length) {
+            if (!fetchedLink.includes(url))
+                parallelTasks.push(
+                    fetch(url, { redirect: 'follow', method: 'GET' })
+                );
             fetchedLink.push(url);
-            parallelTasks.push(
-                fetch(url, { redirect: 'follow', method: 'GET' })
-            );
         }
     }
 
     const responses = await Promise.all(
         parallelTasks.map((t) => t.catch((e) => e))
     );
-    return responses
+    const failedURLs = responses
         .filter((r) => !(r instanceof Error) && !r.ok)
         .map((r) => r.url);
+    return fetchedLink.filter((l) => failedURLs.indexOf(l) > -1);
 };
 
 // TESTED

@@ -18,9 +18,9 @@ const resource = /* html */ `
     <img alt="Addy Osmani 5" src="https://example.com/image/1L2RBhCLSnXjCnSlevaDjy3vba73/LJyNTOzyWbowv2mrlzPS.jpeg?auto=format&amp;fit=crop&amp;h=64&amp;w=64">
     <img alt="Addy Osmani 6" src="https://external.com/image/1L2RBhCLSnXjCnSlevaDjy3vba73/LJyNTOzyWbowv2mrlzPS.jpeg?auto=format&amp;fit=crop&amp;h=64&amp;w=64">
     <img alt="Addy Osmani 7" src="https://external.com/image/1L2RBhCLSnXjCnSlevaDjy3vba73/LJyNTOzyWbowv2mrlzPS.jpeg?auto=format&amp;fit=crop&amp;h=64&amp;w=64">
-    <img alt="Addy Osmani 8" src="https://external.com/image/broken/1L2RBhCLSnXjCnSlevaDjy3vba73/LJyNTOzyWbowv2mrlzPS.jpeg?auto=format&amp;fit=crop&amp;h=64&amp;w=64">
-    <img alt="Addy Osmani 9" src="https://external.com/image/broken/1L2RBhCLSnXjCnSlevaDjy3vba73/LJyNTOzyWbowv2mrlzPS.jpeg?auto=format&amp;fit=crop&amp;h=64&amp;w=64">
-    <img alt="Addy Osmani 10" src="https://external.com/image/broken/1L2RBhCLSnXjCnSlevaDjy3vba73/LJyNTOzyWbowv2mrlzPS.jpeg?auto=format&amp;fit=crop&amp;h=64&amp;w=64">
+    <img alt="Addy Osmani 8" src="https://external.com/image/broken/1L2RBhCLSnXjCnSlevaDjy1vba73/LJyNTOzyWbowv2mrlzPS.jpeg?auto=format&amp;fit=crop&amp;h=64&amp;w=64">
+    <img alt="Addy Osmani 9" src="https://external.com/image/broken/1L2RBhCLSnXjCnSlevaDjy2vba73/LJyNTOzyWbowv2mrlzPS.jpeg?auto=format&amp;fit=crop&amp;h=64&amp;w=64">
+    <img alt="Addy Osmani 10" src="https://external.com/image/broken/1L2RBhCLSnXjCnSlevaDjy2vba73/LJyNTOzyWbowv2mrlzPS.jpeg?auto=format&amp;fit=crop&amp;h=64&amp;w=64">
 
     <a href="https://example.com/abc"></a>
     <a href="https://example.com/xyz"></a>
