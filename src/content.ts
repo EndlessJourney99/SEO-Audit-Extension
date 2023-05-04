@@ -5,7 +5,7 @@ import {
     HTMLImage,
     RequestMessage,
 } from './types/Execution';
-import { CreateGuid } from './utils/GlobalUtils';
+import { CreateGuid, GetImageRealSrc } from './utils/GlobalUtils';
 import './WebComponents/overlay';
 
 let headerTree: HTMLHeading[] = new Array<HTMLHeading>();
@@ -226,18 +226,3 @@ function CrawlCurrentHTML() {
 //     window.scrollTo(0, originalParams.scrollTop);
 //     document.querySelector('body')?.style.overflow = originalParams.overflow;
 // }
-
-function GetImageRealSrc(imgElement: HTMLImageElement): string {
-    if (
-        imgElement.src.length === 0 ||
-        imgElement.src.startsWith('data:image/')
-    ) {
-        if (imgElement.getAttribute('data-lazy-src')?.length)
-            return imgElement.getAttribute('data-lazy-src')!;
-        if (imgElement.getAttribute('data-src')?.length)
-            return imgElement.getAttribute('data-src')!;
-        if (imgElement.getAttribute('data-lazy')?.length)
-            return imgElement.getAttribute('data-lazy')!;
-    }
-    return imgElement.src;
-}

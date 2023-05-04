@@ -2,7 +2,7 @@ import { convert } from 'html-to-text';
 
 import robotsParser from '../CustomRobotParser';
 import { GetRedirectionChain, IsLinkInternal } from './ChecklistUtils';
-import { isValidUrl } from '../GlobalUtils';
+import { GetImageRealSrc, isValidUrl } from '../GlobalUtils';
 
 // Unit test integrated
 export const PageWithoutDoctype = (DOM: Document): boolean => {
@@ -14,24 +14,22 @@ export const BrokenExternalImages = async (
     DOM: Document,
     currentUrl: URL
 ): Promise<Array<string>> => {
-    const allImgs = Array.from(DOM.querySelectorAll('img')).filter(
-        (i) => i.src.length || i.getAttribute('data-src')?.length
-    );
+    const allImgs = Array.from(DOM.querySelectorAll('img'));
 
-    const externalImg = allImgs.filter(
+    const allImgsSrc = allImgs.map((i) => GetImageRealSrc(i));
+
+    const externalImgSrc = allImgsSrc.filter(
         (i) =>
-            !IsLinkInternal(i.src, currentUrl) &&
-            !IsLinkInternal(i.getAttribute('data-src') ?? '', currentUrl) &&
-            (i.src.startsWith('http') ||
-                i.getAttribute('data-src')?.startsWith('http'))
+            (i.length &&
+                !i.startsWith('data:image/') &&
+                IsLinkInternal(i, currentUrl)) ||
+            IsLinkInternal(i, currentUrl)
     );
 
     let fetchedLink = new Array<string>();
     let parallelTasks = new Array<Promise<Response>>();
-    for (let i = 0; i < externalImg.length; i++) {
-        const url = externalImg[i].getAttribute('src')?.length
-            ? externalImg[i].getAttribute('src')
-            : externalImg[i].getAttribute('data-src');
+    for (let i = 0; i < externalImgSrc.length; i++) {
+        const url = externalImgSrc[i];
 
         if (url?.length && isValidUrl(url)) {
             if (!fetchedLink.includes(url))
@@ -98,7 +96,7 @@ export const BrokenExternalLinks = async (
         )
     );
     return responses
-        .filter((r) => !(r instanceof Error) && !r.ok)
+        .filter((r) => !(r instanceof Error) && !r.ok && r.status !== 429)
         .map((r) => r.url);
 };
 

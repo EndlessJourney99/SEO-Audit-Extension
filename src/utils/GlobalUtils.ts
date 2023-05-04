@@ -38,7 +38,7 @@ function CreateGuid() {
         var p = (Math.random().toString(16) + '000000000').substring(2, 8);
         return s ? '-' + p.substring(0, 4) + '-' + p.substring(4, 4) : p;
     }
-    return _p8(false) + _p8(true) + _p8(true) + _p8(false);
+    return _p8(false) + _p8(true) + _p8(false) + _p8(true) + _p8(false);
 }
 
 function Since(amount: number, type: 'days' | 'hours' | 'minutes') {
@@ -64,6 +64,21 @@ function isValidUrl(urlStr: string): boolean {
     }
 }
 
+function GetImageRealSrc(imgElement: HTMLImageElement): string {
+    if (
+        imgElement.src.length === 0 ||
+        imgElement.src.startsWith('data:image/')
+    ) {
+        if (imgElement.getAttribute('data-lazy-src')?.length)
+            return imgElement.getAttribute('data-lazy-src')!;
+        if (imgElement.getAttribute('data-src')?.length)
+            return imgElement.getAttribute('data-src')!;
+        if (imgElement.getAttribute('data-lazy')?.length)
+            return imgElement.getAttribute('data-lazy')!;
+    }
+    return imgElement.src;
+}
+
 export {
     readCsvFile,
     storageName,
@@ -72,4 +87,5 @@ export {
     dbName,
     randomRange,
     isValidUrl,
+    GetImageRealSrc,
 };

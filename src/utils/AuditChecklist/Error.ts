@@ -1,4 +1,5 @@
 import { BackgroundMessage } from '../../types/Execution';
+import { GetImageRealSrc } from '../GlobalUtils';
 import {
     ISO_3166_1_Alpha2_Country,
     ISO_639_1_Language,
@@ -120,22 +121,22 @@ export const BrokenInternalJsAndCss = async (
 
 // TESTED
 export const BrokenInternalImage = async (DOM: Document, currentUrl: URL) => {
-    const allImgs = Array.from(DOM.querySelectorAll('img')).filter(
-        (i) => i.src.length || i.getAttribute('data-src')?.length
-    );
+    const allImgs = Array.from(DOM.querySelectorAll('img'));
 
-    const internalImg = allImgs.filter(
+    const allImgsSrc = allImgs.map((i) => GetImageRealSrc(i));
+
+    const internalImgSrc = allImgsSrc.filter(
         (i) =>
-            (i.src && IsLinkInternal(i.src, currentUrl)) ||
-            (i.getAttribute('data-src') &&
-                IsLinkInternal(i.getAttribute('data-src') ?? '', currentUrl))
+            (i.length &&
+                !i.startsWith('data:image/') &&
+                IsLinkInternal(i, currentUrl)) ||
+            IsLinkInternal(i, currentUrl)
     );
 
     let fetchedLink = new Array<string>();
     let parallelTasks = new Array<Promise<Response>>();
-    for (let i = 0; i < internalImg.length; i++) {
-        let link =
-            internalImg[i].src ?? internalImg[i].getAttribute('data-src');
+    for (let i = 0; i < internalImgSrc.length; i++) {
+        let link = internalImgSrc[i];
         if (link && !link.includes('http') && !link.includes('www'))
             link = `${currentUrl.protocol}//${currentUrl.hostname}/${
                 link.startsWith('/') ? link.substring(1) : link

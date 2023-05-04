@@ -1,16 +1,23 @@
-import { Signal } from '@preact/signals';
-import { DocumentInfo } from '../../types/Execution';
+import { Signal, useSignal } from '@preact/signals';
+import { DocumentInfo, HTMLImage } from '../../types/Execution';
 import { GlobalSignal } from '../../signals/globalSignal';
-import { useContext } from 'preact/hooks';
+import { useContext, useEffect } from 'preact/hooks';
 import { AppState } from '../../signals/globalContext';
 import { ScrollToElem, TriggerHighlight } from '../../utils/SendCommand';
 import SkeletonFetching from '../SkeletonFetching/SkeletonFetching';
+import { CreateGuid } from '../../utils/GlobalUtils';
+import ArrowDownward from '@mui/icons-material/ArrowDropDownOutlined';
+import ArrowUpward from '@mui/icons-material/ArrowDropUpOutlined';
 
 type props = {
     docsInfo: Signal<DocumentInfo | null>;
 };
 
-const handleResponseResult = (response: Response) => {
+const handleResponseResult = (
+    response: Response,
+    id: string,
+    fetchedData: Signal<Array<{ uniqueId: string; size: number }>>
+) => {
     const returnElem: JSX.Element | JSX.Element[] = [];
     if (response.ok) {
         returnElem.push(
@@ -23,7 +30,7 @@ const handleResponseResult = (response: Response) => {
         const contentLength = response.headers.get('Content-Length');
         if (contentLength) {
             const lengthNumber = parseInt(contentLength, 10);
-            if (!Number.isNaN(lengthNumber))
+            if (!Number.isNaN(lengthNumber)) {
                 returnElem.push(
                     <td data-val={lengthNumber}>
                         <span className="italic font-mono">
@@ -31,8 +38,11 @@ const handleResponseResult = (response: Response) => {
                         </span>
                     </td>
                 );
+            }
+            fetchedData.value.push({ uniqueId: id, size: lengthNumber });
         } else {
             returnElem.push(<td></td>);
+            fetchedData.value.push({ uniqueId: id, size: 0 });
         }
     } else {
         returnElem.push(
@@ -45,6 +55,7 @@ const handleResponseResult = (response: Response) => {
                 <td></td>
             </>
         );
+        fetchedData.value.push({ uniqueId: id, size: 0 });
     }
 
     return returnElem;
@@ -76,11 +87,30 @@ const loadingElem = (
 
 const ImageAnalysis = ({ docsInfo }: props) => {
     const state: GlobalSignal = useContext(AppState);
+    const rowData = useSignal<JSX.Element[]>([]);
+    const isSort = useSignal(false);
+    const fetchedData = useSignal<Array<{ uniqueId: string; size: number }>>(
+        []
+    );
     const constructTable = () => {
         const row: JSX.Element[] = [];
-        docsInfo.value?.imageTags.map((item) =>
+        const currentUrl = new URL(state.tabInfo.value.url ?? '');
+
+        docsInfo.value?.imageTags.map((item) => {
+            let fetchUrl = item.src;
+            if (
+                fetchUrl &&
+                !fetchUrl.startsWith('data:image/') &&
+                !fetchUrl.includes('http') &&
+                !fetchUrl.includes('www')
+            )
+                fetchUrl = `${currentUrl.protocol}//${currentUrl.hostname}/${
+                    fetchUrl.startsWith('/') ? fetchUrl.substring(1) : fetchUrl
+                }`;
+
+            const id = CreateGuid();
             row.push(
-                <tr 
+                <tr
                     onMouseOver={() =>
                         TriggerHighlight(
                             item.uniqueId,
@@ -101,11 +131,12 @@ const ImageAnalysis = ({ docsInfo }: props) => {
                             state.tabInfo.value.id ?? -1
                         )
                     }
+                    key={id}
                 >
-                    <td title={item.src}>
-                        {item.src.length > 80
-                            ? `${item.src.substring(0, 80)}...`
-                            : item.src}
+                    <td title={fetchUrl}>
+                        {fetchUrl.length > 80
+                            ? `${fetchUrl.substring(0, 80)}...`
+                            : fetchUrl}
                     </td>
                     {/* <td className="whitespace-nowrap overflow-hidden text-ellipsis">
                     {item.src}
@@ -116,17 +147,40 @@ const ImageAnalysis = ({ docsInfo }: props) => {
 
                     <SkeletonFetching
                         loadingElem={loadingElem}
-                        fetchUrl={item.src}
+                        fetchUrl={fetchUrl}
                         processResponseResult={handleResponseResult}
+                        callBackArgs={[id, fetchedData]}
                     />
                 </tr>
-            )
-        );
-
+            );
+        });
+        rowData.value = row;
         // row[0].
-
-        return row;
     };
+
+    useEffect(() => {
+        constructTable();
+    }, []);
+
+    useEffect(() => {
+        if (fetchedData.value.length === rowData.value.length) {
+            fetchedData.value.sort((a, b) => {
+                if (isSort.value) return b.size - a.size;
+                return a.size - b.size;
+            });
+            const cloneRowData = [...rowData.value];
+            const sortedRowData = new Array<JSX.Element>();
+            for (let i = 0; i < fetchedData.value.length; i++) {
+                const id = fetchedData.value[i].uniqueId;
+                const findItem = cloneRowData.find((i) => i.key === id);
+                if (findItem) {
+                    sortedRowData.push(findItem!);
+                }
+            }
+            rowData.value = sortedRowData;
+        }
+    }, [isSort.value]);
+
     return (
         <section key="ImageAnalysis">
             <table className="table-fixed w-full [&>thead>tr>td]:font-bold [&>thead>tr>td]:px-2 [&>tbody>tr]:cursor-pointer [&>tbody>tr]:border-b [&>tbody>tr:hover]:bg-blue-100 [&>tbody>tr>td]:px-2 [&>tbody>tr>td:first-child]:break-all [&>tbody>tr>td:nth-child(2)]:italic [&>tbody>tr>td]:p-3">
@@ -137,10 +191,16 @@ const ImageAnalysis = ({ docsInfo }: props) => {
                         <td className="w-[70px]">Width</td>
                         <td className="w-[70px]">Height</td>
                         <td className="w-[70px]">Status</td>
-                        <td className="w-[100px]">Size</td>
+                        <td
+                            className="w-[100px] cursor-pointer hover:bg-slate-300 rounded-md p-3"
+                            onClick={() => (isSort.value = !isSort.value)}
+                        >
+                            Size{' '}
+                            {isSort.value ? <ArrowDownward /> : <ArrowUpward />}
+                        </td>
                     </tr>
                 </thead>
-                <tbody>{constructTable()}</tbody>
+                <tbody>{rowData.value}</tbody>
             </table>
         </section>
     );
