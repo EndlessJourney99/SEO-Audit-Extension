@@ -300,7 +300,14 @@ export const PageWithoutH1 = (DOM: Document): boolean => {
 };
 
 export const MissingAltAttribute = (DOM: Document): number => {
-    const allImgs = Array.from(DOM.querySelectorAll('img'));
+    const allImgs = Array.from(DOM.querySelectorAll('img')).filter(
+        (i) =>
+            i.src.length ||
+            i.srcset.length ||
+            i.getAttribute('data-src')?.length ||
+            i.getAttribute('data-lazy')?.length ||
+            i.getAttribute('data-lazy-src')?.length
+    );
 
     return allImgs.filter(
         (i) =>
@@ -313,7 +320,7 @@ export const MissingAltAttribute = (DOM: Document): number => {
 export const LowTextToHtmlRatio = (
     DOM: Document
 ): [isLow: boolean, ratio: number] => {
-    const htmlString = `<html>${DOM.documentElement.innerHTML}</html>`;
+    const htmlString = DOM.documentElement.outerHTML;
     const contentText = convert(DOM.body.outerHTML);
     const ratio = Math.ceil((contentText.length / htmlString.length) * 100);
 

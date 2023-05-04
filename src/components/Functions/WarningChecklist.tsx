@@ -95,24 +95,24 @@ const WarningChecklist = () => {
             );
             index++;
         }
-        if (checkList.lowTextToHtmlRatio && checkList.lowTextToHtmlRatio[0]) {
-            rows.push(
-                <tr>
-                    <td>{index}</td>
-                    <td>
-                        Low text-HTML ratio{' '}
-                        <span className="font-bold italic">
-                            ({checkList.lowTextToHtmlRatio[1]} percent)
-                        </span>
-                    </td>
-                    <td>
-                        This mean your text content is too low compare to the
-                        size of HTML that made up the whole page.
-                    </td>
-                </tr>
-            );
-            index++;
-        }
+        // if (checkList.lowTextToHtmlRatio && checkList.lowTextToHtmlRatio[0]) {
+        //     rows.push(
+        //         <tr>
+        //             <td>{index}</td>
+        //             <td>
+        //                 Low text-HTML ratio{' '}
+        //                 <span className="font-bold italic">
+        //                     ({checkList.lowTextToHtmlRatio[1]} percent)
+        //                 </span>
+        //             </td>
+        //             <td>
+        //                 This mean your text content is too low compare to the
+        //                 size of HTML that made up the whole page.
+        //             </td>
+        //         </tr>
+        //     );
+        //     index++;
+        // }
         if (checkList.pageWithoutMetaDescription) {
             rows.push(
                 <tr>

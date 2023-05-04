@@ -1,4 +1,4 @@
-import { useContext, useEffect, useLayoutEffect } from 'preact/compat';
+import { useContext } from 'preact/compat';
 import { AppState } from './signals/globalContext';
 import Header from './components/Header';
 import Functions from './components/Functions';
