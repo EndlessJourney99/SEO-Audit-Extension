@@ -199,16 +199,10 @@ export const BlockedInternalResourceInRobotsTxt = async (
     await robots.useRobotsFor(baseUrl.origin);
 
     const internalImages = Array.from(DOM.querySelectorAll('img')).filter(
-        (i) =>
-            (i.getAttribute('src')?.length ||
-                i.getAttribute('data-src')?.length) &&
-            (i.getAttribute('src')?.indexOf(baseUrl.hostname) !== -1 ||
-                (i.getAttribute('src')?.indexOf('http') === -1 &&
-                    i.getAttribute('src')?.indexOf('www') === -1) ||
-                (i.getAttribute('data-src')?.indexOf(baseUrl.hostname) ?? -1) >
-                    -1 ||
-                (i.getAttribute('data-src')?.indexOf('http') === -1 &&
-                    i.getAttribute('data-src')?.indexOf('www') === -1))
+        (i) => {
+            const src = GetImageRealSrc(i);
+            return IsLinkInternal(src, baseUrl);
+        }
     );
 
     const internalScript = Array.from(DOM.querySelectorAll('script')).filter(

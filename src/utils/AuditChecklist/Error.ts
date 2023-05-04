@@ -262,7 +262,9 @@ export const MixedContent = (DOM: Document) => {
     const mixedImgs = Array.from(DOM.querySelectorAll('img')).filter(
         (i) =>
             i.src?.startsWith('http://') ||
-            i.getAttribute('data-src')?.startsWith('http://')
+            i.getAttribute('data-src')?.startsWith('http://') ||
+            i.getAttribute('data-lazy')?.startsWith('http://') ||
+            i.getAttribute('data-lazy-src')?.startsWith('http://')
     );
     const mixedIframe = Array.from(DOM.querySelectorAll('iframe')).filter(
         (i) =>
