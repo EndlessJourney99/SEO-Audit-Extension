@@ -20,10 +20,9 @@ export const BrokenExternalImages = async (
 
     const externalImgSrc = allImgsSrc.filter(
         (i) =>
-            (i.length &&
-                !i.startsWith('data:image/') &&
-                IsLinkInternal(i, currentUrl)) ||
-            IsLinkInternal(i, currentUrl)
+            i.length &&
+            !i.startsWith('data:image/') &&
+            !IsLinkInternal(i, currentUrl)
     );
 
     let fetchedLink = new Array<string>();
