@@ -134,7 +134,7 @@ const getAllImageTag = (): HTMLImage[] => {
     ).map<HTMLImage>((i) => {
         return {
             uniqueId: CreateGuid(),
-            src: i.src ?? i.getAttribute('data-src'),
+            src: GetImageRealSrc(i),
             alt: i.alt,
             name: i.name,
             title: i.title,
@@ -226,3 +226,18 @@ function CrawlCurrentHTML() {
 //     window.scrollTo(0, originalParams.scrollTop);
 //     document.querySelector('body')?.style.overflow = originalParams.overflow;
 // }
+
+function GetImageRealSrc(imgElement: HTMLImageElement): string {
+    if (
+        imgElement.src.length === 0 ||
+        imgElement.src.startsWith('data:image/')
+    ) {
+        if (imgElement.getAttribute('data-lazy-src')?.length)
+            return imgElement.getAttribute('data-lazy-src')!;
+        if (imgElement.getAttribute('data-src')?.length)
+            return imgElement.getAttribute('data-src')!;
+        if (imgElement.getAttribute('data-lazy')?.length)
+            return imgElement.getAttribute('data-lazy')!;
+    }
+    return imgElement.src;
+}
