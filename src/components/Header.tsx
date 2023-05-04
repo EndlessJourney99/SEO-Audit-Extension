@@ -7,9 +7,10 @@ import { useIndexedDB } from '../hooks/IndexedDB';
 interface props {
     title: string;
     version: string;
+    isStart: boolean;
 }
 
-const Header = ({ title, version }: props) => {
+const Header = ({ title, version, isStart }: props) => {
     const state: GlobalSignal = useContext(AppState);
     const { clear } = useIndexedDB(storageName);
 
@@ -27,12 +28,16 @@ const Header = ({ title, version }: props) => {
                 </span>
             </div>
             <div className="col-auto text-right" id="info-contact-section">
-                <button
-                    className="py-2 px-10 bg-blue-500 hover:bg-blue-600 rounded-md text-white font-bold"
-                    onClick={cleanDB}
-                >
-                    Re-Crawl
-                </button>
+                {isStart ? (
+                    <button
+                        className="py-2 px-10 bg-blue-500 hover:bg-blue-600 rounded-md text-white font-bold"
+                        onClick={cleanDB}
+                    >
+                        Re-Crawl
+                    </button>
+                ) : (
+                    ''
+                )}
             </div>
         </header>
     );

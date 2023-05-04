@@ -9,7 +9,8 @@
         "declarativeNetRequest",
         "browsingData",
         "webRequest",
-        "webNavigation"
+        "webNavigation",
+        "storage"
     ],
     "content_scripts": [
         {

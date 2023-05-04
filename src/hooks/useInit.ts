@@ -1,4 +1,4 @@
-import { useSignal } from '@preact/signals';
+import { Signal, useSignal } from '@preact/signals';
 import { DocumentInfo, RequestMessage, TagName } from '../types/Execution';
 import { useEffect } from 'preact/hooks';
 import { useIndexedDB } from './IndexedDB';
@@ -25,7 +25,10 @@ const RequestPageDocument = async (tabId: number): Promise<DocumentInfo> => {
     throw new Error('There is no active tab!');
 };
 
-const useInit = (tabInfo: chrome.tabs.Tab, updateSignal: number) => {
+const useInit = (
+    tabInfo: chrome.tabs.Tab,
+    updateSignal: number
+) => {
     const { getByID, add, update } = useIndexedDB(storageName);
     const IsProcessing = useSignal<boolean>(false);
     const docsInfo = useSignal<DocumentInfo | null>(null);

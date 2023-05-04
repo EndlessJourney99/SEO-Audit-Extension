@@ -8,6 +8,7 @@ import { DBConfig } from './utils/IndexedDBConfig';
 
 await initDB(DBConfig);
 const globalStateInit = await chromeSignal();
+
 render(
     <AppState.Provider value={globalStateInit}>
         <App />

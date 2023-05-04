@@ -53,7 +53,7 @@ const BotRender = async (url: string, userAgent: string) => {
                 extension: false,
                 protectedWeb: false,
             },
-            since: Since(1, 'hours'),
+            since: Since(30, 'minutes'),
         });
         const newWindow = await chrome.windows.create({
             state: 'normal',

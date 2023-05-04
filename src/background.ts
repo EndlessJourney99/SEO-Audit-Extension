@@ -61,12 +61,16 @@ const removeTabData = (tabId: number) => {
 
 chrome.tabs.onRemoved.addListener((tabId, info) => {
     removeTabData(tabId);
+    chrome.storage.local.remove(tabId.toString());
 });
 
 chrome.webNavigation.onCommitted.addListener((details) => {
-    if (details.transitionType.indexOf('reload') > -1)
+    if (details.transitionType.indexOf('reload') > -1) {
         removeTabData(details.tabId);
+        chrome.storage.local.remove(details.tabId.toString());
+    }
 });
+
 // async function RunFetch(urls: Array<string>) {
 //     for (let i = 0; i < urls.length; i++) {}
 // }

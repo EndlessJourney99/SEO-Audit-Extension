@@ -160,6 +160,9 @@ const ImageAnalysis = ({ docsInfo }: props) => {
 
     useEffect(() => {
         constructTable();
+        chrome.storage.local.get('isStarted').then((val) => {
+            console.log(val);
+        });
     }, []);
 
     useEffect(() => {

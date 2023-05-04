@@ -18,6 +18,7 @@ import ErrorCheckList from './ErrorChecklist';
 import LinkAnalysis from './LinkAnalysis';
 import HeaderTree from './HeaderTree';
 import ImageAnalysis from './ImageAnalysis';
+import { useSignal } from '@preact/signals';
 
 const Functions = () => {
     const state: GlobalSignal = useContext(AppState);
