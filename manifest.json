@@ -1,7 +1,7 @@
 {
-    "name": "SEO METAs",
-    "description": "Check all METAs",
-    "version": "1.0",
+    "name": "SEO Audit",
+    "description": "SEO Technical Audit",
+    "version": "1.0.0",
     "manifest_version": 3,
     "permissions": [
         "tabs",
@@ -40,6 +40,6 @@
     ],
     "action": {
         "default_popup": "index.html",
-        "default_title": "Open the popup"
+        "default_title": "Start auditing page"
     }
 }
