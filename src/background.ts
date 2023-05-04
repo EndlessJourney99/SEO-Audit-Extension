@@ -65,7 +65,10 @@ chrome.tabs.onRemoved.addListener((tabId, info) => {
 });
 
 chrome.webNavigation.onCommitted.addListener((details) => {
-    if (details.transitionType.indexOf('reload') > -1) {
+    if (
+        details.transitionType.indexOf('reload') > -1 ||
+        details.transitionType.indexOf('link') > -1
+    ) {
         removeTabData(details.tabId);
         chrome.storage.local.remove(details.tabId.toString());
     }
