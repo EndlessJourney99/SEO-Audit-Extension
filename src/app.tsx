@@ -7,21 +7,6 @@ import { GlobalSignal } from './signals/globalSignal';
 
 export const App = () => {
     const state: GlobalSignal = useContext(AppState);
-    // const tabInfo = useSignal<chrome.tabs.Tab>({} as chrome.tabs.Tab);
-
-    // useLayoutEffect(() => {
-    //     // requestCertData(new URL('https://elitedental.com.vn/')).then(
-    //     //     (result) => {
-    //     //         console.log(result);
-    //     //     }
-    //     // );
-    //     // testRedirectInfo();
-    //     getByID<DbSchema>(state.tabInfo.value.id ?? -1).then((data) => {
-    //         if (data) {
-    //             isStart.value = true;
-    //         }
-    //     });
-    // }, []);
 
     const StartApp = () => {
         state.isStarted.value = true;
@@ -51,3 +36,5 @@ export const App = () => {
         </div>
     );
 };
+
+// wYy/llXUf/9AWqEU
