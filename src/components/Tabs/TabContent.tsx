@@ -6,8 +6,13 @@ interface props extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const TabContent = ({ children, ...props }: props) => {
+    const state: tabContextProps = useContext(TabContext);
     return (
-        <div id="myTabContent" {...props}>
+        <div
+            id="myTabContent"
+            {...props}
+            className={`${state.sideMenu ? 'col-span-3' : ''}`}
+        >
             {children}
         </div>
     );

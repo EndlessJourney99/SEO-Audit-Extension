@@ -1,4 +1,4 @@
-import { useContext } from 'preact/hooks';
+import { useContext, useEffect } from 'preact/hooks';
 import { TabContext, tabContextProps } from './TabContext';
 import { computed, useSignal } from '@preact/signals';
 
@@ -20,13 +20,28 @@ const Tab = ({ tabKey, children, icon, callBack }: props) => {
     };
 
     return (
-        <li className={isActive.value ? 'active mr-2 group' : 'mr-2 group'}>
+        <li
+            className={`${
+                isActive.value ? 'active mr-2 group' : 'mr-2 group'
+            } ${state.sideMenu ? '[&>button]:w-full' : ''}`}
+        >
             <button
                 key={tabKey}
                 onClick={tabClick}
-                className="inline-flex p-4 pl-0 border-b-2 border-transparent rounded-t-lg hover:text-blue-500 group-[.active]:text-blue-600 hover:border-blue-500 group-[.active]:border-blue-600"
+                className={`${
+                    !state.isOpen.value && state.sideMenu
+                        ? 'justify-center py-4'
+                        : 'p-4 pl-0'
+                } inline-flex border-b-2 border-transparent rounded-t-lg hover:text-blue-500 group-[.active]:text-blue-600 hover:border-blue-500 group-[.active]:border-blue-600`}
             >
-                {icon} &nbsp; {children}
+                {icon} &nbsp;{' '}
+                <span
+                    className={`whitespace-nowrap ${
+                        !state.isOpen.value && state.sideMenu ? 'hidden' : ''
+                    }`}
+                >
+                    {children}
+                </span>
             </button>
         </li>
     );

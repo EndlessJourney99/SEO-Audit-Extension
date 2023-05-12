@@ -30,6 +30,7 @@ const Functions = () => {
     return (
         <Tabs
             defaultKey={savedActiveTab.value ? savedActiveTab.value : 'Summary'}
+            sideMenu={true}
             className="py-3"
         >
             <TabHeader>
