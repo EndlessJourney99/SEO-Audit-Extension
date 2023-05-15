@@ -14,7 +14,7 @@ export const App = () => {
     };
 
     return (
-        <div className="container-custom px-7 py-5 mx-auto">
+        <div className="container-custom px-5 py-5 mx-auto">
             <Header
                 title={state.manifest.value.name}
                 version={state.manifest.value.version}
