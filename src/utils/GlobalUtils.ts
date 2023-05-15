@@ -1,4 +1,5 @@
 import { RequestMessage } from '../types/Execution';
+import userAgentsData from '../../public/UserAgents.json';
 
 const dbName = 'FPExtensionDB';
 const storageName = 'MetaSEO';
@@ -79,6 +80,52 @@ function GetImageRealSrc(imgElement: HTMLImageElement): string {
     return imgElement.src;
 }
 
+function IsMobileAgent(agent: string) {
+    const mobileAgents = userAgentsData
+        .filter((a) => a.is_mobile)
+        .map((a) => a.user_agent);
+    return mobileAgents.indexOf(agent) > -1;
+}
+
+function RuleConstruct(userAgent: string) {
+    return {
+        removeRuleIds: [1],
+        addRules: [
+            {
+                id: 1,
+                priority: 2,
+                action: {
+                    type: 'modifyHeaders' as chrome.declarativeNetRequest.RuleActionType,
+                    requestHeaders: [
+                        {
+                            header: 'user-agent',
+                            operation:
+                                'set' as chrome.declarativeNetRequest.HeaderOperation,
+                            value: userAgent,
+                        },
+                    ],
+                },
+                condition: {
+                    urlFilter: '|https*',
+                    resourceTypes: [
+                        'main_frame' as chrome.declarativeNetRequest.ResourceType,
+                        'xmlhttprequest' as chrome.declarativeNetRequest.ResourceType,
+                    ],
+                },
+            },
+        ],
+    };
+}
+
+function FindMetaRobots(documentStr: string) {
+    const parser = new DOMParser();
+    const docObj = parser.parseFromString(documentStr, 'text/html');
+
+    return Array.from(docObj.querySelectorAll("meta[name='robots']")).map(
+        (i) => i.getAttribute('content') ?? ''
+    );
+}
+
 export {
     readCsvFile,
     storageName,
@@ -88,4 +135,7 @@ export {
     randomRange,
     isValidUrl,
     GetImageRealSrc,
+    IsMobileAgent,
+    RuleConstruct,
+    FindMetaRobots,
 };

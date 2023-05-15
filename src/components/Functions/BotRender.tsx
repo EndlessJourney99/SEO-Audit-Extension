@@ -1,9 +1,9 @@
-import { effect, useSignal } from '@preact/signals';
+import { useSignal } from '@preact/signals';
 import useRender from '../../hooks/useRender';
-import { UserAgent } from '../../types/UserAgents';
 import { GlobalSignal } from '../../signals/globalSignal';
 import { useContext } from 'preact/hooks';
 import { AppState } from '../../signals/globalContext';
+import userAgentsData from '../../../public/UserAgents.json';
 import Notify from '../Notify';
 
 const BotRender = () => {
@@ -24,12 +24,8 @@ const BotRender = () => {
                     <option selected disabled value="">
                         -- Select User-Agent --
                     </option>
-                    {Object.keys(UserAgent).map((item) => (
-                        <option
-                            value={UserAgent[item as keyof typeof UserAgent]}
-                        >
-                            {item}
-                        </option>
+                    {userAgentsData.map((item) => (
+                        <option value={item.user_agent}>{item.name}</option>
                     ))}
                 </select>
 

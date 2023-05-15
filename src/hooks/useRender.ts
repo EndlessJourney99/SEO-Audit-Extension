@@ -1,51 +1,20 @@
 import { batch, useSignal } from '@preact/signals';
-import { TakeScreenShot } from '../utils/TakeScreenshotHandle';
 import { NotifyType } from '../components/Notify';
-import { DeviceViewport, UserAgent } from '../types/UserAgents';
-import { Since } from '../utils/GlobalUtils';
-
-const ruleConstruct = (userAgent: string) => {
-    return {
-        removeRuleIds: [1],
-        addRules: [
-            {
-                id: 1,
-                priority: 2,
-                action: {
-                    type: 'modifyHeaders' as chrome.declarativeNetRequest.RuleActionType,
-                    requestHeaders: [
-                        {
-                            header: 'user-agent',
-                            operation:
-                                'set' as chrome.declarativeNetRequest.HeaderOperation,
-                            value: userAgent,
-                        },
-                    ],
-                },
-                condition: {
-                    urlFilter: '|https*',
-                    resourceTypes: [
-                        'main_frame' as chrome.declarativeNetRequest.ResourceType,
-                        'xmlhttprequest' as chrome.declarativeNetRequest.ResourceType,
-                    ],
-                },
-            },
-        ],
-    };
-};
+import { DeviceViewport } from '../types/UserAgents';
+import { IsMobileAgent, Since, RuleConstruct } from '../utils/GlobalUtils';
+import userAgentsData from '../../public/UserAgents.json';
 
 const BotRender = async (url: string, userAgent: string) => {
     await chrome.declarativeNetRequest.updateDynamicRules(
-        ruleConstruct(userAgent)
+        RuleConstruct(userAgent)
     );
 
     if (chrome.runtime.lastError) {
         throw new Error(chrome.runtime.lastError.message);
     } else {
-        const viewPort =
-            UserAgent.GoogleBot_SmartPhone === userAgent
-                ? DeviceViewport.Mobile
-                : DeviceViewport.Desktop;
+        const viewPort = IsMobileAgent(userAgent)
+            ? DeviceViewport.Mobile
+            : DeviceViewport.Desktop;
 
         await chrome.browsingData.removeCache({
             originTypes: {
@@ -62,7 +31,7 @@ const BotRender = async (url: string, userAgent: string) => {
             width: viewPort.width,
             height: viewPort.height,
         });
-        if (UserAgent.GoogleBot_SmartPhone === userAgent && newWindow.tabs) {
+        if (IsMobileAgent(userAgent) && newWindow.tabs) {
             chrome.scripting.insertCSS({
                 target: { tabId: newWindow.tabs[0].id ?? -1 },
                 css: 'body::-webkit-scrollbar{display: none;}',
